@@ -1,0 +1,345 @@
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Microsoft YaHei", sans-serif;
+}
+
+.theme-dark {
+    --page-background: #1a1a1a;
+    --page-color: #fff;
+    --sidebar-background: #222;
+    --border-color: #333;
+    --hover-background: #333;
+    --card-background: #262626;
+    --card-border: #333;
+    --app-item-border: none;
+    --secondary-color: #999;
+}
+
+.theme-light {
+    --page-background: #fff;
+    --page-color: #000;
+    --sidebar-background: #f5f5f5;
+    --border-color: #ddd;
+    --hover-background: #e8e8e8;
+    --card-background: #f9f9f9;
+    --card-border: #eee;
+    --app-item-border: 1px solid #eee;
+    --secondary-color: #666;
+}
+
+.settings-layout {
+    display: flex;
+    height: 100vh;
+    color: var(--page-color);
+    background: var(--page-background);
+}
+
+.sidebar {
+    width: 220px;
+    padding: 20px 0;
+    background: var(--sidebar-background);
+    border-right: 1px solid var(--border-color);
+}
+
+.sidebar-item {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 14px 20px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.sidebar-item:hover {
+    background: var(--hover-background);
+}
+
+.sidebar-item.active {
+    color: #fff;
+    background: #007aff;
+}
+
+.sidebar-item img {
+    width: 18px;
+    height: 18px;
+    object-fit: contain;
+}
+
+.main {
+    flex: 1;
+    padding: 40px;
+}
+
+.title {
+    margin-bottom: 30px;
+    font-size: 26px;
+}
+
+.box {
+    padding: 24px;
+    background: var(--card-background);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+}
+
+.wallpaper-settings {
+    margin-top: 28px;
+}
+
+.wallpaper-settings h3 {
+    margin-bottom: 8px;
+}
+
+.wallpaper-description {
+    margin-bottom: 20px;
+    color: var(--secondary-color);
+    font-size: 14px;
+}
+
+.wallpaper-category {
+    margin-bottom: 24px;
+}
+
+.wallpaper-category h4 {
+    margin-bottom: 12px;
+    font-size: 17px;
+}
+
+.wallpaper-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(170px, 1fr));
+    gap: 14px;
+}
+
+.wallpaper-card-wrap {
+    min-width: 0;
+}
+
+.wallpaper-card {
+    display: block;
+    overflow: hidden;
+    padding: 6px !important;
+    color: var(--page-color) !important;
+    background: var(--card-background) !important;
+    border: 2px solid var(--card-border) !important;
+    border-radius: 10px !important;
+    text-align: left;
+}
+
+.wallpaper-card:hover {
+    border-color: #007aff !important;
+}
+
+.wallpaper-card.selected {
+    border-color: #007aff !important;
+}
+
+.wallpaper-card img {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: 6px;
+}
+
+.wallpaper-card span {
+    display: block;
+    overflow: hidden;
+    margin: 8px 4px 4px;
+    font-size: 13px;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.wallpaper-cycle-option {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 6px 4px 0;
+    color: var(--secondary-color);
+    font-size: 12px;
+}
+
+.wallpaper-cycle-option input {
+    accent-color: #007aff;
+}
+
+.wallpaper-custom {
+    margin-top: 28px;
+    padding: 18px;
+    background: var(--card-background);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+}
+
+.wallpaper-custom label {
+    display: block;
+    margin-bottom: 10px;
+    font-weight: 600;
+}
+
+.wallpaper-url-row {
+    display: flex;
+    gap: 10px;
+}
+
+.wallpaper-url-row input {
+    flex: 1;
+    min-width: 0;
+    padding: 10px 12px;
+    color: var(--page-color);
+    background: var(--page-background);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    font-size: 14px;
+}
+
+.wallpaper-interval-row {
+    align-items: center;
+    margin-top: 12px;
+}
+
+.wallpaper-interval-row label {
+    flex: 0 0 auto;
+    margin: 0;
+    font-size: 14px;
+}
+
+.wallpaper-interval-row input {
+    flex: 0 0 120px;
+}
+
+.row {
+    margin: 16px 0;
+}
+
+@media (max-width: 700px) {
+    .settings-layout {
+        height: auto;
+        min-height: 100vh;
+    }
+
+    .sidebar {
+        width: 150px;
+    }
+
+    .main {
+        min-width: 0;
+        padding: 24px;
+    }
+
+    .wallpaper-url-row {
+        flex-direction: column;
+    }
+}
+
+.settings-layout button {
+    padding: 10px 18px;
+    color: #fff;
+    background: #007aff;
+    border: 0;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 15px;
+}
+
+.password-settings {
+    max-width: 500px;
+    margin: 0 auto;
+    padding: 30px;
+}
+
+.password-settings h2 {
+    margin-bottom: 24px;
+    font-size: 24px;
+}
+
+.password-field {
+    margin-bottom: 16px;
+}
+
+.password-field.confirm-password {
+    margin-bottom: 20px;
+}
+
+.password-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+}
+
+.password-field input {
+    width: 100%;
+    padding: 10px 14px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 15px;
+    outline: none;
+}
+
+.password-actions {
+    display: flex;
+    gap: 12px;
+}
+
+.password-actions button {
+    flex: 1;
+}
+
+.password-actions .remove-password {
+    background: #666;
+}
+
+.uninstall-page {
+    min-height: 100vh;
+    padding: 30px;
+    color: var(--page-color);
+    background: var(--page-background);
+}
+
+.uninstall-page .title {
+    margin-bottom: 30px;
+    text-align: center;
+    font-size: 24px;
+}
+
+.app-list {
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.app-item {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 10px;
+    padding: 16px 20px;
+    background: var(--sidebar-background);
+    border: var(--app-item-border);
+    border-radius: 8px;
+}
+
+.app-name {
+    font-size: 16px;
+}
+
+.uninstall-btn {
+    padding: 8px 14px;
+    color: #fff;
+    background: #ff3b30;
+    border: 0;
+    border-radius: 6px;
+    cursor: pointer;
+}
+
+.uninstall-btn:hover {
+    background: #ff2015;
+}
+
+.tip {
+    margin-top: 20px;
+    color: var(--secondary-color);
+    text-align: center;
+}

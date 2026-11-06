@@ -1,0 +1,585 @@
+/* Global reset */
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    font-family: "Microsoft YaHei", sans-serif;
+}
+
+body {
+    width: 100vw;
+    height: 100vh;
+    background: var(--desktop-wallpaper, url("./wallpaper/wildgoose/bg.jpg")) center/cover no-repeat;
+    overflow: hidden;
+    position: relative;
+}
+
+/* ======================== */
+/* Desktop icons */
+/* ======================== */
+#desktop-icons {
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;          /* Fill a column vertically, then wrap to the next column. */
+    align-content: flex-start;
+    gap: 16px 24px;           /* 16px row gap and 24px column gap. */
+    height: calc(100vh - 90px); /* Limit height to wrap before reaching the taskbar. */
+    position: relative;
+    z-index: 1;
+}
+
+.desktop-icon {
+    width: 70px;
+    text-align: center;
+    color: #222222;
+    font-size: 12px;
+    cursor: pointer;
+    text-shadow: none;
+    border-radius: 6px;
+    padding: 4px;
+    transition: 0.2s;
+}
+
+    .desktop-icon:hover {
+        background: rgba(0, 0, 0, 0.08);
+        transform: scale(1.05);
+    }
+
+    .desktop-icon img {
+        width: 48px;
+        height: 48px;
+        margin-bottom: 4px;
+    }
+
+/* ======================== */
+/* Taskbar */
+/* ======================== */
+.taskbar {
+    position: fixed;
+    bottom: 10px;
+    left: 50%;
+    transform: translateX(-50%);
+    height: 50px;
+    background: rgba(255, 255, 255, 0.65);
+    backdrop-filter: blur(20px);
+    border-radius: 14px;
+    display: flex;
+    align-items: center;
+    padding: 0 20px;
+    gap: 12px;
+    z-index: 9999;
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.12);
+}
+
+body.window-fullscreen .taskbar {
+    display: none;
+}
+
+.start-btn {
+    padding: 8px 14px;
+    border-radius: 8px;
+    border: none;
+    background: rgba(0, 0, 0, 0.08);
+    color: #222222;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .start-btn:hover {
+        background: rgba(0, 0, 0, 0.14);
+    }
+
+.task-apps {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.task-app-item {
+    width: 36px;
+    height: 36px;
+    border-radius: 8px;
+    background: rgba(0,0,0,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: grab;
+    user-select: none;
+    transition: 0.2s;
+    position: relative;
+}
+
+    .task-app-item:active {
+        cursor: grabbing;
+    }
+
+    .task-app-item.dragging {
+        opacity: 0.45;
+    }
+
+    .task-app-item:hover {
+        background: rgba(0,0,0,0.14);
+        transform: scale(1.08);
+    }
+
+    .task-app-item img {
+        width: 20px;
+        height: 20px;
+        object-fit: contain;
+    }
+
+.task-app-item.running::after {
+    content: "";
+    position: absolute;
+    bottom: 2px;
+    left: 50%;
+    width: 12px;
+    height: 3px;
+    border-radius: 2px;
+    background: #2878d0;
+    transform: translateX(-50%);
+}
+
+.taskbar-context-menu {
+    position: fixed;
+    display: none;
+    width: 196px;
+    padding: 5px;
+    border: 1px solid rgba(0, 0, 0, 0.12);
+    border-radius: 8px;
+    background: rgba(250, 250, 250, 0.98);
+    color: #222;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+    z-index: 10000;
+}
+
+.taskbar-context-menu button {
+    display: block;
+    width: 100%;
+    padding: 8px 10px;
+    border: 0;
+    border-radius: 5px;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    font: inherit;
+    cursor: pointer;
+}
+
+.taskbar-context-menu button:hover:not(:disabled) {
+    background: rgba(0, 0, 0, 0.08);
+}
+
+.taskbar-context-menu button:disabled {
+    opacity: 0.45;
+    cursor: default;
+}
+
+.taskbar-context-menu .taskbar-context-title {
+    font-weight: 600;
+}
+
+.taskbar-context-separator {
+    height: 1px;
+    margin: 4px 5px;
+    background: rgba(0, 0, 0, 0.12);
+}
+
+.task-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    color: #222222;
+    font-size: 12px;
+    margin-left: auto;
+}
+
+.show-desktop {
+    padding: 4px 8px;
+    background: rgba(0, 0, 0, 0.08);
+    border-radius: 6px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+    .show-desktop:hover {
+        background: rgba(0, 0, 0, 0.14);
+    }
+
+.time {
+    min-width: 80px;
+    text-align: right;
+}
+
+/* ======================== */
+/* Refactored Start menu - light theme */
+/* ======================== */
+.start-menu {
+    position: fixed;
+    bottom: 70px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: min(680px, calc(100vw - 40px));
+    height: min(560px, calc(100vh - 110px));
+    background: rgba(255, 255, 255, 0.92);
+    backdrop-filter: blur(22px);
+    border-radius: 18px;
+    padding: 0; /* The iframe fills the area; padding is set in startmenu.html. */
+    color: #1f1f1f;
+    display: none;
+    z-index: 9998;
+    box-shadow: 0 16px 45px rgba(0,0,0,0.18);
+    overflow: hidden;
+}
+
+/* Start menu iframe fills its container */
+#startMenuFrame {
+    width: 100%;
+    height: 100%;
+    border: none;
+    border-radius: 18px;
+    background: transparent;
+}
+
+/* Search box */
+.search-box {
+    margin-bottom: 20px;
+}
+#appSearch {
+    width: 100%;
+    padding: 12px 18px;
+    border-radius: 12px;
+    border: 1px solid rgba(0,0,0,0.12);
+    background: rgba(0,0,0,0.05);
+    color: #1f1f1f;
+    font-size: 15px;
+    outline: none;
+    transition: all 0.2s ease;
+}
+#appSearch:focus {
+    background: rgba(0,0,0,0.08);
+}
+
+/* Pinned apps: Windows 11-style grid cards */
+.fixed-apps {
+    margin-bottom: 22px;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 12px;
+    max-height: 180px;
+    overflow-y: auto;
+    padding-right: 8px;
+}
+.fixed-apps h4 {
+    grid-column: 1 / -1;
+    font-size: 13px;
+    color: #666666;
+    font-weight: normal;
+    margin-bottom: 6px;
+}
+.fixed-apps .app-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 6px;
+    padding: 12px 8px;
+    border-radius: 8px;
+    cursor: pointer;
+}
+.fixed-apps .app-item img {
+    width: 36px;
+    height: 36px;
+}
+.fixed-apps .app-item:hover {
+    background: rgba(0,0,0,0.07);
+    padding-left: 8px;
+}
+
+/* All apps: single-column list */
+.all-apps {
+    max-height: 210px;
+    overflow-y: auto;
+    margin-bottom: 20px;
+    padding-right: 8px;
+}
+.all-apps h4 {
+    font-size: 13px;
+    color: #666666;
+    font-weight: normal;
+    margin-bottom: 6px;
+}
+.all-apps .app-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 10px 12px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: 14px;
+    transition: 0.2s;
+}
+.all-apps .app-item:hover {
+    background: rgba(0,0,0,0.07);
+    padding-left: 16px;
+}
+.all-apps .app-item img {
+    width: 26px;
+    height: 26px;
+    object-fit: contain;
+}
+
+/* Power buttons */
+.power-row {
+    display: flex;
+    gap: 12px;
+    padding-top: 14px;
+    border-top: 1px solid rgba(0,0,0,0.12);
+}
+.power-btn {
+    flex: 1;
+    padding: 12px;
+    border-radius: 12px;
+    border: none;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    transition: filter 0.2s ease;
+}
+.power-btn.restart {
+    background: #555555;
+}
+.power-btn.shutdown {
+    background: #d32f2f;
+}
+.power-btn.logout {
+    background: #666666;
+}
+.power-btn:hover {
+    filter: brightness(1.12);
+}
+
+/* Consistent scrollbar styling for all lists */
+.fixed-apps::-webkit-scrollbar,
+.all-apps::-webkit-scrollbar {
+    width: 6px;
+}
+.fixed-apps::-webkit-scrollbar-thumb,
+.all-apps::-webkit-scrollbar-thumb {
+    background: rgba(0,0,0,0.2);
+    border-radius: 99px;
+}
+.fixed-apps::-webkit-scrollbar-track,
+.all-apps::-webkit-scrollbar-track {
+    background: transparent;
+}
+/* ======================== */
+/* App windows - light theme */
+/* ======================== */
+.app-window {
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    width: 600px;
+    height: 400px;
+    background: #ffffff;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.22);
+    color: #1f1f1f;
+    z-index: 100;
+    transition: all 0.2s ease;
+    resize: both;
+    min-width: 300px;
+    min-height: 200px;
+}
+
+.window-header {
+    flex: 0 0 auto;
+    padding: 10px 14px;
+    background: #f3f3f3;
+    display: flex;
+    justify-content: space-between;
+    cursor: move;
+}
+
+.window-actions {
+    display: flex;
+    gap: 1px; /* Seamless buttons for a native system look. */
+}
+
+    .window-actions button {
+        background: transparent;
+        border: none;
+        width: 45px; /* Wider hit target for system controls. */
+        height: 32px; /* Match the title bar height. */
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.15s ease;
+        position: relative;
+        font-size: 0; /* Hide the original symbols. */
+    }
+
+    .window-actions .fullscreen-toggle {
+        color: #444444;
+        font-size: 20px;
+    }
+
+    .window-actions .fullscreen-toggle.is-active {
+        width: auto;
+        padding: 0 12px;
+        font-size: 12px;
+    }
+
+    /* Minimize button: system-style horizontal line */
+    .window-actions .minimize::after {
+        content: "";
+        width: 14px;
+        height: 2px;
+        background: #444444;
+        border-radius: 1px;
+    }
+
+    /* Maximize button: system-style square */
+    .window-actions .maximize::after {
+        content: "";
+        width: 12px;
+        height: 12px;
+        border: 2px solid #444444;
+        border-radius: 1px;
+        box-sizing: border-box;
+    }
+
+    /* Close button: system-style X */
+    .window-actions .close::after {
+        content: "";
+        position: absolute;
+        width: 14px;
+        height: 14px;
+    }
+    /* The two lines that form the X */
+    .window-actions .close::before {
+        content: "";
+        width: 14px;
+        height: 2px;
+        background: #444444;
+        transform: rotate(45deg);
+        border-radius: 1px;
+    }
+
+    .window-actions .close::after {
+        content: "";
+        width: 14px;
+        height: 2px;
+        background: #444444;
+        transform: rotate(-45deg);
+        border-radius: 1px;
+    }
+
+    /* Hover effect (faithful to the Windows light theme) */
+    .window-actions .minimize:hover {
+        background: rgba(0, 0, 0, 0.08);
+    }
+
+        .window-actions .minimize:hover::after {
+            background: #000000;
+        }
+
+    .window-actions .maximize:hover {
+        background: rgba(0, 0, 0, 0.08);
+    }
+
+    .window-actions .fullscreen-toggle:hover {
+        background: rgba(0, 0, 0, 0.08);
+        color: #000000;
+    }
+
+        .window-actions .maximize:hover::after {
+            border-color: #000000;
+        }
+
+    .window-actions .close:hover {
+        background: #e81123; /* Native Windows close-button red. */
+    }
+
+        .window-actions .close:hover::before,
+        .window-actions .close:hover::after {
+            background: white;
+        }
+
+iframe {
+    width: 100%;
+    height: calc(100% - 42px);
+    border: none;
+    background: white;
+}
+
+.app-window iframe {
+    flex: 1 1 0;
+    height: 0;
+    min-height: 0;
+}
+
+.app-window.maximized {
+    width: 100vw !important;
+    height: calc(100vh - 70px) !important;
+    top: 0 !important;
+    left: 0 !important;
+    border-radius: 0;
+}
+
+.app-window.fullscreen {
+    position: fixed !important;
+    inset: 0;
+    width: 100vw !important;
+    height: 100vh !important;
+    min-width: 0;
+    min-height: 0;
+    top: 0 !important;
+    left: 0 !important;
+    display: flex;
+    flex-direction: column;
+    resize: none;
+    border-radius: 0;
+    z-index: 10001 !important;
+}
+
+.app-window.fullscreen .window-header {
+    flex: 0 0 auto;
+}
+
+.app-window.fullscreen .window-actions button:not(.fullscreen-toggle) {
+    display: none;
+}
+
+.app-window.fullscreen iframe {
+    flex: 1 1 auto;
+    height: auto;
+    min-height: 0;
+}
+
+/* new code */
+
+/* Highlight the focused window's title bar - light theme */
+.app-window.win-focus .window-header {
+    background:#e1e1e1;
+}
+/* Dim inactive window title bars */
+.app-window .window-header {
+    background:#f3f3f3;
+}
+
+/* ======================== */
+/* Aero Snap animation */
+/* ======================== */
+.app-window.snap-left,
+.app-window.snap-right {
+    transition: left 0.18s ease, top 0.18s ease, width 0.18s ease, height 0.18s ease;
+}
+.app-window.dragging {
+    transition: none;
+}

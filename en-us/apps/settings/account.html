@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>Account settings</title>
+    <script src="settings-theme.js"></script>
+    <link rel="stylesheet" href="settings.css">
+</head>
+<body class="settings-layout">
+
+<div class="sidebar">
+    <div class="sidebar-item" onclick="openPersonalizedSettings()">
+        <img src="personal.png" alt="">
+        Personalization
+    </div>
+    <div class="sidebar-item" onclick="window.location.href='apps.html'">
+        <img src="apps.png" alt="">
+        Uninstall apps
+    </div>
+    <div class="sidebar-item active">
+        <img src="user.png" alt="">
+        Account
+    </div>
+    <div class="sidebar-item" onclick="window.location.href='about.html'">
+        <img src="about.svg" alt="">
+        About
+    </div>
+</div>
+
+<div class="password-settings">
+    <h2>Password management</h2>
+
+    <div class="password-field">
+        <label for="new_pwd">Set a new password</label>
+        <input id="new_pwd" type="password" placeholder="Enter a new password">
+    </div>
+
+    <div class="password-field confirm-password">
+        <label for="confirm_pwd">Confirm new password</label>
+        <input id="confirm_pwd" type="password" placeholder="Re-enter the new password">
+    </div>
+
+    <div class="password-actions">
+        <button onclick="savePassword()">Save password</button>
+        <button onclick="removePassword()" class="remove-password">No password</button>
+    </div>
+</div>
+
+<script>
+function hash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        let chr = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0;
+    }
+    return Math.abs(hash).toString(16);
+}
+
+function savePassword() {
+    let p1 = document.getElementById("new_pwd").value;
+    let p2 = document.getElementById("confirm_pwd").value;
+
+    if (!p1 || !p2) {
+        alert("Please complete both fields.");
+        return;
+    }
+
+    if (p1 !== p2) {
+        alert("The passwords do not match.");
+        return;
+    }
+
+    let hashedPwd = hash(p1);
+    localStorage.setItem("wg_login_hash", hashedPwd);
+
+    alert("✅ Password set successfully!");
+
+    document.getElementById("new_pwd").value = "";
+    document.getElementById("confirm_pwd").value = "";
+}
+
+function removePassword() {
+    if (confirm("Are you sure you want to disable password sign-in?")) {
+        localStorage.removeItem("wg_login_hash");
+        alert("✅ Password sign-in disabled. Your account is not password-protected.");
+    }
+}
+</script>
+</body>
+</html>

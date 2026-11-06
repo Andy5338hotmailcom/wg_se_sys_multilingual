@@ -1,0 +1,9 @@
+{
+  "id": "browser",
+  "name": "Browser",
+  "icon": "apps/browser/ico.svg",
+  "path": "apps/browser/index.html",
+  "color": "#2563eb",
+  "category": "Network",
+  "developer": "Wildgoose"
+}

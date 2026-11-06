@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>WGAPP Installer</title>
+    <style>
+        *{margin:0;padding:0;box-sizing:border-box;font-family:system-ui}
+        body{background:#1a1a1a;color:#fff;height:100vh;display:flex;align-items:center;justify-content:center}
+        .box{background:#222;padding:40px;border-radius:12px;text-align:center}
+        button{padding:12px 24px;background:#0077ff;border:0;border-radius:6px;color:#fff;font-size:16px;cursor:pointer}
+        #info{margin-top:20px;color:#aaa}
+    </style>
+</head>
+<body>
+
+<div class="box">
+    <h2>Install a .wgapp package</h2>
+    <button onclick="document.getElementById('file').click()">Choose package</button>
+    <input type="file" id="file" accept=".wgapp" style="display:none">
+    <div id="info"></div>
+</div>
+
+<script>
+const fileInput = document.getElementById('file');
+const info = document.getElementById('info');
+
+fileInput.onchange = async (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+
+    const text = await file.text();
+    try {
+        const app = JSON.parse(text);
+
+        // Validate the format (supports the legacy path format and the whitepath/blackpath format).
+        if (!app.id || !app.name || (!app.path && !app.whitepath && !app.blackpath)) {
+            info.innerText = "❌ Installation failed: invalid format";
+            return;
+        }
+
+        // Install by writing to localStorage.
+        let list = JSON.parse(localStorage.getItem('app_list') || '[]');
+        if (list.some(i => i.id === app.id)) {
+            info.innerText = "✅ This app is already installed";
+            return;
+        }
+
+        list.push(app);
+        localStorage.setItem('app_list', JSON.stringify(list));
+
+        // Add the app to the desktop.
+        let desk = JSON.parse(localStorage.getItem('desktopIcons') || '[]');
+        if (!desk.includes(app.id)) {
+            desk.push(app.id);
+            localStorage.setItem('desktopIcons', JSON.stringify(desk));
+        }
+
+        info.innerText = `✅ Successfully installed: ${app.name}\nRefresh the desktop to see it`;
+
+    } catch (e) {
+        info.innerText = "❌ This is not a valid .wgapp file";
+    }
+};
+</script>
+
+</body>
+</html>

@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>Personalization settings</title>
+    <link rel="stylesheet" href="settings.css">
+</head>
+<body class="settings-layout theme-light">
+
+    <div class="sidebar">
+        <div class="sidebar-item active">
+            <img src="personal.png" alt="">
+            Personalization
+        </div>
+        <div class="sidebar-item" onclick="window.location.href='apps.html'">
+            <img src="apps.png" alt="">
+            Uninstall apps
+        </div>
+        <div class="sidebar-item" onclick="window.location.href='account.html'">
+            <img src="user.png" alt="">
+            Account
+        </div>
+        <div class="sidebar-item" onclick="window.location.href='about.html'">
+            <img src="about.svg" alt="">
+            About
+        </div>
+    </div>
+
+    <div class="main">
+        <h2 class="title">Personalization</h2>
+        <div class="box">
+            <div class="row">Current theme: Light</div>
+            <button onclick="switchToBlack()">Switch to dark theme</button>
+        </div>
+        <section class="wallpaper-settings">
+            <h3>Desktop wallpaper</h3>
+            <p class="wallpaper-description">Click an image or select it for the slideshow to apply it immediately. The interval is saved automatically. Images play in the order they were added. Wallpapers affect only the main desktop.</p>
+            <div id="wallpaper-categories"></div>
+            <div class="wallpaper-custom">
+                <label for="wallpaper-url">Wallpaper path / URL (separate multiple entries with commas)</label>
+                <div class="wallpaper-url-row">
+                    <input id="wallpaper-url" type="text" placeholder="./wallpaper/wildgoose/bg.jpg, ./wallpaper/wip12/WP12-LM.png">
+                </div>
+                <div class="wallpaper-url-row wallpaper-interval-row">
+                    <label for="wallpaper-interval">Slideshow interval (seconds)</label>
+                    <input id="wallpaper-interval" type="number" min="1" step="1" value="60">
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <script src="settings-wallpaper.js"></script>
+    <script>
+function switchToBlack() {
+    localStorage.setItem("WG_color", "b");
+    parent.postMessage({ action: "theme-change", theme: "b" }, "*");
+    window.location.href = "personalized_b.html";
+}
+    </script>
+</body>
+</html>

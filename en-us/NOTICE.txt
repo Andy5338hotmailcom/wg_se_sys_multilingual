@@ -1,0 +1,6 @@
+NOTICE
+This repository contains multiple components with different licenses.
+1. Main Wildgoose OS source code: MIT License
+2. apps/wgsysoffice/* : GNU AGPL‑3.0‑only License
+These components are aggregate work, runtime isolated by iframe,
+not forming a single combined derivative work.

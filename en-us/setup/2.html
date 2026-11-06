@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wildgoose Setup - Install now</title>
+    <link rel="stylesheet" href="wizard.css">
+</head>
+<body>
+    <main class="setup-shell">
+        <header class="setup-header">
+            <img src="../icon.png" alt="" class="setup-logo">
+            <h1>Wildgoose</h1>
+        </header>
+        <section class="setup-card setup-card-centered" aria-labelledby="page-title">
+            <p class="step-label">Setup · Step 2 of 4</p>
+            <h2 id="page-title">Ready to install?</h2>
+            <p class="intro">Continue to choose the operating system to install.</p>
+            <div class="actions actions-split">
+                <a class="button button-secondary" href="index.html">Back</a>
+                <button class="button button-primary" id="install-now" type="button">Install now</button>
+            </div>
+        </section>
+    </main>
+    <script>
+        document.getElementById("install-now").addEventListener("click", () => {
+            window.location.href = "3.html";
+        });
+    </script>
+</body>
+</html>

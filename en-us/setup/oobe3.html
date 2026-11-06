@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Set an account password - Wildgoose OOBE</title>
+<style>
+* {margin:0;padding:0;box-sizing:border-box;font-family:Microsoft YaHei,sans-serif;}
+body {
+    background: linear-gradient(120deg, #e8dff8, #f3eafb);
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.title-text {
+    position: absolute;
+    top: 80px;
+    left: 60px;
+    animation: fadeInUp 1.2s ease-out;
+}
+.title-text h1 {
+    color: #4b2e83;
+    font-size: 36px;
+    font-weight: 600;
+}
+.title-text p {
+    color: #6b4e99;
+    margin-top: 12px;
+    font-size: 18px;
+}
+
+.login-box {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    animation: fadeInUp 1.2s 0.2s both;
+    width: 380px;
+}
+
+.input-box {
+    width: 100%;
+    height: 60px;
+    padding: 0 20px;
+    border: 1px solid #d4c5f0;
+    border-radius: 16px;
+    font-size: 17px;
+    outline: none;
+    transition: 0.2s;
+}
+.input-box:focus {
+    border-color: #9c7cdd;
+}
+
+.btn-primary {
+    width: 100%;
+    height: 60px;
+    border: none;
+    border-radius: 16px;
+    background: linear-gradient(90deg, #9c7cdd, #b198ee);
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-skip {
+    width: 100%;
+    height: 60px;
+    border: 1px solid #b198ee;
+    border-radius: 16px;
+    background: transparent;
+    color: #4b2e83;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.btn-primary:hover, .btn-skip:hover {
+    transform: scale(1.02);
+    opacity: 0.9;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(25px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="title-text">
+    <h1>Set a sign-in password</h1>
+    <p>Wildgoose Second Edition</p>
+</div>
+
+<div class="login-box">
+    <input type="password" class="input-box" id="new_pwd" placeholder="Enter a password">
+    <input type="password" class="input-box" id="confirm_pwd" placeholder="Confirm password">
+    
+    <button class="btn-primary" onclick="savePassword()">Set password</button>
+    <button class="btn-skip" onclick="removePassword()">Skip password (sign in without a password)</button>
+</div>
+
+<script>
+// Password hashing logic.
+function hash(str) {
+    let hash = 0;
+    for (let i = 0; i < str.length; i++) {
+        let chr = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + chr;
+        hash |= 0;
+    }
+    return Math.abs(hash).toString(16);
+}
+
+// Save the password.
+function savePassword() {
+    let p1 = document.getElementById("new_pwd").value.trim();
+    let p2 = document.getElementById("confirm_pwd").value.trim();
+
+    if (!p1 || !p2) {
+        alert("Please complete both fields.");
+        return;
+    }
+    if (p1 !== p2) {
+        alert("The passwords do not match.");
+        return;
+    }
+
+    let hashedPwd = hash(p1);
+    localStorage.setItem("wg_login_hash", hashedPwd);
+    location.href = "oobe4.html";
+}
+
+// Continue without a password.
+function removePassword() {
+    localStorage.removeItem("wg_login_hash");
+    location.href = "oobe4.html";
+}
+</script>
+
+</body>
+</html>

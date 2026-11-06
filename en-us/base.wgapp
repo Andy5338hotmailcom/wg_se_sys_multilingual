@@ -1,0 +1,5 @@
+{ id: "appstore", name: "App Store", icon: "apps/appstore/ico.svg", whitepath: "apps/appstore/white.html", blackpath: "apps/appstore/black.html", version: "2" },
+{ id: "reg", name: "Software Registry", icon: "apps/reg/ico.png", whitepath: "apps/reg/white.html", blackpath: "apps/reg/black.html", version: "2" },
+{ id: "appinstall", name: "WGAPP Installer", icon: "apps/reg/ico.png", whitepath: "apps/appinstall/white.html", blackpath: "apps/appinstall/black.html", version: "2" },
+{ id: "settings", name: "Settings", icon: "apps/settings/ico.svg", whitepath: "apps/settings/personalized_w.html", blackpath: "apps/settings/personalized_b.html", version: "2" },
+{ id: "wgver", name: "About Wildgoose BE", icon: "icon.png", whitepath: "apps/wgver/white.html", blackpath: "apps/wgver/black.html", version: "2" }

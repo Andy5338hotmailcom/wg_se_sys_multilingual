@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System recovery</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#60a5fa',
+                        dark: '#1e3a8a',
+                        light: '#eff6ff'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+
+            .progress-bar {
+                transition: width 0.5s ease-in-out;
+            }
+        }
+    </style>
+    <style>
+        body {
+            background-image: url('../../wallpaper/wildgoose/bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+
+        .step {
+            display: none;
+        }
+
+            .step.active {
+                display: block;
+                animation: fadeIn 0.5s ease-in-out;
+            }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .button-hover {
+            transition: all 0.3s ease;
+        }
+
+            .button-hover:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+            }
+
+        .restart-animation {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% {
+                transform: scale(1);
+            }
+
+            50% {
+                transform: scale(1.05);
+            }
+
+            100% {
+                transform: scale(1);
+            }
+        }
+    </style>
+</head>
+<body class="flex items-center justify-center min-h-screen p-4">
+    <!-- Recovery window -->
+    <div class="w-full max-w-2xl glass-effect rounded-lg shadow-2xl overflow-hidden">
+        <!-- Window title bar -->
+        <div class="bg-dark bg-opacity-70 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <img src="../../icon.png"
+                     class="w-6 h-6 text-primary mr-3 object-contain"
+                     alt="Icon">
+                <h1 class="text-light text-xl font-semibold text-shadow">System recovery</h1>
+            </div>
+        </div>
+
+        <!-- Recovery content -->
+        <div class="px-8 py-6">
+            <!-- Step indicators -->
+            <div class="flex justify-between mb-8">
+                <div class="step-indicator flex flex-col items-center" data-step="1">
+                    <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center mb-2 step-1-active">1</div>
+                    <span class="text-xs text-light">Confirm recovery</span>
+                </div>
+                <div class="flex-1 mx-2 relative">
+                    <div class="absolute top-4 left-0 right-0 h-0.5 bg-gray-600"></div>
+                    <div class="absolute top-4 left-0 h-0.5 bg-primary transition-all duration-500" id="progress-line-1"></div>
+                </div>
+                <div class="step-indicator flex flex-col items-center" data-step="2">
+                    <div class="w-8 h-8 rounded-full bg-gray-600 text-white flex items-center justify-center mb-2" id="step-2-indicator">2</div>
+                    <span class="text-xs text-light">Recovery progress</span>
+                </div>
+                <div class="flex-1 mx-2 relative">
+                    <div class="absolute top-4 left-0 right-0 h-0.5 bg-gray-600"></div>
+                    <div class="absolute top-4 left-0 h-0.5 bg-primary transition-all duration-500" id="progress-line-2"></div>
+                </div>
+                <div class="step-indicator flex flex-col items-center" data-step="3">
+                    <div class="w-8 h-8 rounded-full bg-gray-600 text-white flex items-center justify-center mb-2" id="step-3-indicator">3</div>
+                    <span class="text-xs text-light">Restart system</span>
+                </div>
+            </div>
+
+            <!-- Step content -->
+            <div class="steps-container">
+                <!-- Step 1: Confirm recovery -->
+                <div class="step active" id="step-1">
+                    <div class="text-center mb-6">
+                        <i class="fa fa-info-circle text-primary text-4xl mb-4"></i>
+                        <h2 class="text-2xl font-bold text-light mb-2">Welcome to the system recovery wizard</h2>
+                        <p class="text-gray-300">Confirm that you want to recover this system. The process will take a few minutes.</p>
+                    </div>
+
+                    <div class="bg-dark bg-opacity-50 rounded-lg p-4 mb-6">
+                        <h3 class="text-lg font-semibold text-primary mb-3">System information</h3>
+                        <div class="space-y-2 text-gray-300">
+                            <div class="flex justify-between">
+                                <span>System edition:</span>
+                                <span class="font-medium">Wildgoose Beginning Edition</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Required space:</span>
+                                <span class="font-medium">5 GB</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>System requirements:</span>
+                                <span class="font-medium">8 GB RAM, 64 GB disk space</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Current system:</span>
+                                <span class="font-medium">Meets all requirements</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <button id="cancel-btn" class="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded transition-colors">
+                            Cancel
+                        </button>
+                        <button id="start-install" class="px-6 py-2 bg-primary hover:bg-blue-600 text-white rounded button-hover">
+                            Confirm recovery
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 2: Recovery progress -->
+                <div class="step" id="step-2">
+                    <div class="text-center mb-6">
+                        <i class="fa fa-spinner fa-spin text-primary text-4xl mb-4"></i>
+                        <h2 class="text-2xl font-bold text-light mb-2">Recovering the system</h2>
+                        <p class="text-gray-300" id="installation-status">Preparing recovery files...</p>
+                    </div>
+
+                    <div class="mb-6">
+                        <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
+                            <div id="progress-bar" class="h-full bg-primary progress-bar" style="width: 0%"></div>
+                        </div>
+                        <div class="flex justify-between mt-2 text-sm text-gray-400">
+                            <span>0%</span>
+                            <span id="progress-percentage">0%</span>
+                            <span>100%</span>
+                        </div>
+                    </div>
+
+                    <div class="bg-dark bg-opacity-50 rounded-lg p-4 mb-6 h-32 overflow-y-auto">
+                        <h3 class="text-lg font-semibold text-primary mb-2">Recovery log</h3>
+                        <div id="installation-log" class="text-xs text-gray-300 font-mono">
+                            <p>Initializing recovery...</p>
+                        </div>
+                    </div>
+
+                    <div class="flex justify-end">
+                        <button id="cancel-install" class="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded transition-colors">
+                            Cancel recovery
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 3: Restart system -->
+                <div class="step" id="step-3">
+                    <div class="text-center mb-6">
+                        <i class="fa fa-check-circle text-green-500 text-4xl mb-4"></i>
+                        <h2 class="text-2xl font-bold text-light mb-2">Recovery complete</h2>
+                        <p class="text-gray-300">The system was recovered successfully. Restart to complete the second stage.</p>
+                    </div>
+
+                    <div class="flex justify-between">
+                        <button id="restart-now" class="px-6 py-2 bg-green-600 hover:bg-green-500 text-white rounded button-hover restart-animation">
+                            Continue to stage two
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Get DOM elements.
+            const startInstallBtn = document.getElementById('start-install');
+            const cancelInstallBtn = document.getElementById('cancel-install');
+            const restartNowBtn = document.getElementById('restart-now');
+            const progressBar = document.getElementById('progress-bar');
+            const progressPercentage = document.getElementById('progress-percentage');
+            const installationStatus = document.getElementById('installation-status');
+            const installationLog = document.getElementById('installation-log');
+            const step2Indicator = document.getElementById('step-2-indicator');
+            const step3Indicator = document.getElementById('step-3-indicator');
+            const progressLine1 = document.getElementById('progress-line-1');
+            const progressLine2 = document.getElementById('progress-line-2');
+
+            // Recovery step log.
+            const installLogs = [
+                'Initializing recovery...',
+                'Checking system compatibility...',
+                'Restoring the partition table...',
+                'Restoring the system partition...',
+                'Restoring system files (1/3)...',
+                'Restoring system files (2/3)...',
+                'Restoring system files (3/3)...',
+                'Restoring system components...',
+                'Restoring system settings...',
+                'Restoring drivers...',
+                'Restoring system accounts...',
+                'Stage one recovery complete...'
+            ];
+
+            // Start recovery button click handler.
+            startInstallBtn.addEventListener('click', function() {
+                // Switch to step 2.
+                document.getElementById('step-1').classList.remove('active');
+                document.getElementById('step-2').classList.add('active');
+
+                // Update the step indicators.
+                step2Indicator.classList.remove('bg-gray-600');
+                step2Indicator.classList.add('bg-primary');
+                progressLine1.style.width = '100%';
+
+                // Start the simulated recovery process.
+                simulateInstallation();
+            });
+
+            // Cancel recovery button click handler.
+            cancelInstallBtn.addEventListener('click', function() {
+                parent.postMessage({ action: 'closeApp' }, '*');
+            });
+
+            // Close the recovery simulation when canceled.
+            document.getElementById('cancel-btn').addEventListener('click', function() {
+                parent.postMessage({ action: 'closeApp' }, '*');
+            });
+
+            // Restart now button click handler.
+            restartNowBtn.addEventListener('click', function() {
+                parent.postMessage({ action: 'power', cmd: 'restore', target: 'phase2' }, '*');
+            });
+
+            // Simulate the recovery process.
+            function simulateInstallation() {
+                let progress = 0;
+                let logIndex = 0;
+
+                // Update progress every 500 milliseconds.
+                const interval = setInterval(function() {
+                    // Increase progress by a random amount.
+                    const increment = Math.floor(Math.random() * 8) + 1;
+                    progress = Math.min(progress + increment, 100);
+
+                    // Update the progress bar and percentage.
+                    progressBar.style.width = progress + '%';
+                    progressPercentage.textContent = progress + '%';
+
+                    // Update the recovery status.
+                    if (progress < 20) {
+                        installationStatus.textContent = 'Preparing recovery files...';
+                    } else if (progress < 60) {
+                        installationStatus.textContent = 'Recovering system files...';
+                    } else if (progress < 90) {
+                        installationStatus.textContent = 'Restoring system settings...';
+                    } else {
+                        installationStatus.textContent = 'Stage one recovery complete...';
+                    }
+
+                    // Update the recovery log.
+                    if (logIndex < installLogs.length && progress >= logIndex * (100 / installLogs.length)) {
+                        const logEntry = document.createElement('p');
+                        logEntry.textContent = installLogs[logIndex];
+                        installationLog.appendChild(logEntry);
+                        installationLog.scrollTop = installationLog.scrollHeight;
+                        logIndex++;
+                    }
+
+                    // Recovery complete.
+                    if (progress >= 100) {
+                        clearInterval(interval);
+
+                        // Switch to step 3 after a one-second delay.
+                        setTimeout(function() {
+                            document.getElementById('step-2').classList.remove('active');
+                            document.getElementById('step-3').classList.add('active');
+
+                            // Update the step indicators.
+                            step3Indicator.classList.remove('bg-gray-600');
+                            step3Indicator.classList.add('bg-primary');
+                            progressLine2.style.width = '100%';
+                        }, 1000);
+                    }
+                }, 500);
+            }
+
+            // Reset the recovery process.
+            function resetInstallation() {
+                // Reset the progress bar and log.
+                progressBar.style.width = '0%';
+                progressPercentage.textContent = '0%';
+                installationStatus.textContent = 'Preparing recovery files...';
+                installationLog.innerHTML = '<p>Initializing recovery...</p>';
+
+                // Reset the step indicators.
+                step2Indicator.classList.remove('bg-primary');
+                step2Indicator.classList.add('bg-gray-600');
+                step3Indicator.classList.remove('bg-primary');
+                step3Indicator.classList.add('bg-gray-600');
+                progressLine1.style.width = '0%';
+                progressLine2.style.width = '0%';
+
+                // Return to step 1.
+                document.getElementById('step-2').classList.remove('active');
+                document.getElementById('step-3').classList.remove('active');
+                document.getElementById('step-1').classList.add('active');
+            }
+        });
+    </script>
+</body>
+</html>

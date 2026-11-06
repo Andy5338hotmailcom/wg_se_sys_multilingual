@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wildgoose Setup - License terms</title>
+    <link rel="stylesheet" href="wizard.css">
+</head>
+<body>
+    <main class="setup-shell">
+        <header class="setup-header">
+            <img src="../icon.png" alt="" class="setup-logo">
+            <h1>Wildgoose</h1>
+        </header>
+        <section class="setup-card" aria-labelledby="page-title">
+            <p class="step-label">Setup · Step 4 of 4</p>
+            <h2 id="page-title">License terms</h2>
+            <div class="terms" tabindex="0">
+                <h3>Wildgoose SE Terms of Use</h3>
+                <p>Welcome to Wildgoose SE. Please review these terms before continuing with setup.</p>
+                <p><strong>1. License</strong><br>This system is intended for personal learning, evaluation, and lawful use. You may install and run it on your own devices.</p>
+                <p><strong>2. Software and content</strong><br>Different components of this system may be governed by their own license agreements. When using or redistributing those components, comply with their applicable license terms and laws.</p>
+                <p><strong>3. Data and risk</strong><br>Back up important data before installing the system or changing its settings. You are responsible for risks such as data loss or device issues resulting from using, installing, or modifying this system.</p>
+                <p><strong>4. Provided as is</strong><br>This system is provided “as is,” without guarantees of suitability, continued availability, or error-free operation.</p>
+                <p>By accepting and continuing, you confirm that you have read and agree to these terms.</p>
+            </div>
+            <label class="terms-accept">
+                <input type="checkbox" id="accept-terms">
+                <span>I have read and accept the license terms</span>
+            </label>
+            <div class="actions actions-split">
+                <a class="button button-secondary" href="3.html">Back</a>
+                <button class="button button-primary" id="next-step" type="button" disabled>Start setup</button>
+            </div>
+        </section>
+    </main>
+    <script>
+        const acceptTerms = document.getElementById("accept-terms");
+        const nextStep = document.getElementById("next-step");
+        acceptTerms.checked = localStorage.getItem("WG_setup_license_accepted") === "true";
+        nextStep.disabled = !acceptTerms.checked;
+        acceptTerms.addEventListener("change", () => {
+            nextStep.disabled = !acceptTerms.checked;
+            localStorage.setItem("WG_setup_license_accepted", String(acceptTerms.checked));
+        });
+        nextStep.addEventListener("click", () => {
+            if (!acceptTerms.checked) return;
+            window.location.href = "restart.html";
+        });
+    </script>
+</body>
+</html>

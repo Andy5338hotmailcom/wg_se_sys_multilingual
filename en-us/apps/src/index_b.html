@@ -1,0 +1,574 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Student Roll Call</title>
+    <!-- Tailwind CSS v3 -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Font Awesome -->
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/css/font-awesome.min.css" rel="stylesheet">
+    <!-- Shared Tailwind configuration -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#6C63FF',
+                        secondary: '#F59E0B',
+                        light: '#F3F4F6',
+                        dark: '#1F2937'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                    animation: {
+                        'bounce-in': 'bounceIn 0.5s ease-in-out',
+                        'pulse-scale': 'pulseScale 2s infinite',
+                        'fade-in': 'fadeIn 0.5s ease-in-out',
+                        'slide-in': 'slideIn 0.5s ease-in-out',
+                    },
+                    keyframes: {
+                        bounceIn: {
+                            '0%': { transform: 'scale(0.3)', opacity: '0' },
+                            '40%': { transform: 'scale(1.1)' },
+                            '80%': { transform: 'scale(0.9)' },
+                            '100%': { transform: 'scale(1)', opacity: '1' },
+                        },
+                        pulseScale: {
+                            '0%, 100%': { transform: 'scale(1)' },
+                            '50%': { transform: 'scale(1.05)' },
+                        },
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideIn: {
+                            '0%': { transform: 'translateY(20px)', opacity: '0' },
+                            '100%': { transform: 'translateY(0)', opacity: '1' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .text-shadow {
+                text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+            }
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.25);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.18);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-gray-900 to-gray-800 min-h-screen font-sans">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- Page header -->
+        <header class="flex justify-between items-center mb-8">
+            <div class="text-center">
+                <h1 class="text-4xl font-bold text-primary mb-2 text-shadow">Student Roll Call</h1>
+                <p class="text-gray-300">Select students at random to make lessons more interactive.</p>
+            </div>
+            <div class="flex space-x-3">
+                <a href="file-manager.html" class="inline-flex items-center px-4 py-2 bg-primary text-white rounded-lg hover:bg-purple-700 transition-colors">
+                    <i class="fa fa-folder-open mr-2"></i>File manager
+                </a>
+            </div>
+        </header>
+
+        <!-- Main content -->
+        <div class="flex flex-col lg:flex-row gap-6">
+            <!-- Roll-call mode selection -->
+            <div class="lg:w-1/4 bg-gray-800 rounded-xl shadow-lg p-6">
+                <h2 class="text-xl font-semibold text-primary mb-4 flex items-center">
+                    <i class="fa fa-list-ul mr-2"></i>Roll-call mode
+                </h2>
+                <div class="space-y-3" id="mode-list">
+                    <!-- The mode list is generated dynamically by JavaScript. -->
+                    <div class="animate-pulse">
+                        <div class="h-10 bg-gray-700 rounded animate-pulse"></div>
+                        <div class="h-10 bg-gray-700 rounded animate-pulse mt-3"></div>
+                        <div class="h-10 bg-gray-700 rounded animate-pulse mt-3"></div>
+                    </div>
+                </div>
+
+                <hr class="my-6 border-gray-700">
+
+                <!-- Add a temporary student -->
+                <h2 class="text-xl font-semibold text-primary mb-4 flex items-center">
+                    <i class="fa fa-user-plus mr-2"></i>Add temporary
+                </h2>
+                <div class="flex">
+                    <input type="text" id="temp-student" placeholder="Enter a student name" 
+                           class="flex-1 px-4 py-2 border border-gray-600 rounded-l-lg bg-gray-700 text-white focus:outline-none focus:ring-2 focus:ring-primary">
+                    <button id="add-temp" class="bg-primary text-white px-4 py-2 rounded-r-lg hover:bg-purple-700 transition-colors">
+                        <i class="fa fa-plus"></i>
+                    </button>
+                </div>
+
+                <hr class="my-6 border-gray-700">
+
+                <!-- Statistics -->
+                <h2 class="text-xl font-semibold text-primary mb-4 flex items-center">
+                    <i class="fa fa-bar-chart mr-2"></i>Statistics
+                </h2>
+                <div class="bg-gray-700 rounded-lg p-4">
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-300">Total students:</span>
+                        <span id="total-count" class="font-semibold text-white">0</span>
+                    </div>
+                    <div class="flex justify-between mb-2">
+                        <span class="text-gray-300">Called:</span>
+                        <span id="called-count" class="font-semibold text-white">0</span>
+                    </div>
+                    <div class="flex justify-between">
+                        <span class="text-gray-300">Not called:</span>
+                        <span id="remaining-count" class="font-semibold text-white">0</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Roll-call display -->
+            <div class="lg:w-3/4 flex flex-col gap-6">
+                <!-- Student display card -->
+                <div class="bg-gray-800 rounded-xl shadow-lg p-8 flex-grow flex flex-col items-center justify-center relative overflow-hidden">
+                    <div class="absolute top-0 left-0 w-full h-2 bg-gradient-to-r from-primary to-secondary"></div>
+                    
+                    <div class="text-center mb-6">
+                        <h2 class="text-2xl font-semibold text-gray-100" id="current-mode">Select a roll-call mode</h2>
+                        <p class="text-gray-400" id="selection-status">Ready</p>
+                    </div>
+                    
+                    <div class="w-full max-w-md">
+                        <div class="bg-gray-700 rounded-xl p-8 mb-6 relative">
+                            <div class="absolute -top-4 -right-4 bg-secondary text-white rounded-full w-16 h-16 flex items-center justify-center text-2xl font-bold" id="name-number">1</div>
+                            <h1 class="text-6xl font-bold text-primary text-center animate-bounce-in" id="display-name">--</h1>
+                        </div>
+                    </div>
+                    
+                    <!-- History -->
+                    <div class="w-full mt-6">
+                        <h3 class="text-lg font-semibold text-gray-100 mb-3 flex items-center">
+                            <i class="fa fa-history mr-2"></i>Roll-call history
+                        </h3>
+                        <div class="bg-gray-700 rounded-lg p-4 max-h-40 overflow-y-auto" id="history-list">
+                            <!-- History is generated dynamically by JavaScript. -->
+                            <p class="text-gray-400 text-center italic">No records yet</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Controls -->
+                <div class="bg-gray-800 rounded-xl shadow-lg p-6 flex flex-wrap gap-4 justify-center">
+                    <button id="prev-student" class="px-6 py-3 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
+                        <i class="fa fa-arrow-left mr-2"></i>Previous
+                    </button>
+                    <button id="random-student" class="px-8 py-3 bg-primary text-white rounded-lg hover:bg-purple-700 transition-colors flex items-center text-lg font-semibold">
+                        <i class="fa fa-random mr-2"></i>Pick randomly
+                    </button>
+                    <button id="next-student" class="px-6 py-3 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition-colors flex items-center disabled:opacity-50 disabled:cursor-not-allowed">
+                        Next<i class="fa fa-arrow-right ml-2"></i>
+                    </button>
+                    <button id="reset-all" class="px-6 py-3 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors flex items-center">
+                        <i class="fa fa-refresh mr-2"></i>Reset
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Footer -->
+        <footer class="mt-12 text-center text-gray-400 text-sm">
+            <p>Student Roll Call. Created by Guo Chenhao. Enjoy!</p>
+        </footer>
+    </div>
+
+    <!-- Reset confirmation dialog -->
+    <div id="reset-modal" class="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 hidden">
+        <div class="bg-gray-800 rounded-xl shadow-xl p-6 max-w-md w-full mx-4 animate-fade-in">
+            <h3 class="text-xl font-semibold text-gray-100 mb-4">Confirm reset</h3>
+            <p class="text-gray-300 mb-6">Are you sure you want to reset the current roll-call mode? This will clear all called-student records.</p>
+            <div class="flex justify-end gap-3">
+                <button id="cancel-reset" class="px-4 py-2 bg-gray-700 text-gray-200 rounded-lg hover:bg-gray-600 transition-colors">
+                    Cancel
+                </button>
+                <button id="confirm-reset" class="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition-colors">
+                    Confirm reset
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <script>
+        // Global variables.
+        let currentMode = null;
+        let students = [];
+        let remainingStudents = [];
+        let calledStudents = [];
+        let historyIndex = -1;
+        let tempStudents = [];
+
+        // DOM elements.
+        const modeList = document.getElementById('mode-list');
+        const displayName = document.getElementById('display-name');
+        const currentModeElement = document.getElementById('current-mode');
+        const selectionStatus = document.getElementById('selection-status');
+        const nameNumber = document.getElementById('name-number');
+        const historyList = document.getElementById('history-list');
+        const totalCount = document.getElementById('total-count');
+        const calledCount = document.getElementById('called-count');
+        const remainingCount = document.getElementById('remaining-count');
+        const randomStudentBtn = document.getElementById('random-student');
+        const prevStudentBtn = document.getElementById('prev-student');
+        const nextStudentBtn = document.getElementById('next-student');
+        const resetAllBtn = document.getElementById('reset-all');
+        const resetModal = document.getElementById('reset-modal');
+        const cancelResetBtn = document.getElementById('cancel-reset');
+        const confirmResetBtn = document.getElementById('confirm-reset');
+        const tempStudentInput = document.getElementById('temp-student');
+        const addTempBtn = document.getElementById('add-temp');
+
+        // Initialize.
+        document.addEventListener('DOMContentLoaded', () => {
+            loadModes();
+            setupEventListeners();
+        });
+
+        // Load roll-call modes.
+        function loadModes() {
+            // Load files from localStorage.
+            const storedFiles = localStorage.getItem('rollCallFiles');
+            
+            if (storedFiles) {
+                const files = JSON.parse(storedFiles);
+                const modes = files.map(file => ({
+                    id: file.id,
+                    name: file.name.replace('.txt', ''),
+                    file: file.name
+                }));
+                
+                renderModeList(modes);
+            } else {
+                // Initialize sample files.
+                const exampleFiles = [
+                    {
+                        id: 'cs',
+                        name: 'Student IDs (40).txt',
+                        size: 42,
+                        lastModified: Date.now(),
+                        content: '1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40'
+                    },
+                    {
+                        id: 'literature',
+                        name: 'Student IDs (47).txt',
+                        size: 42,
+                        lastModified: Date.now(),
+                        content: '1\n2\n3\n4\n5\n6\n7\n8\n9\n10\n11\n12\n13\n14\n15\n16\n17\n18\n19\n20\n21\n22\n23\n24\n25\n26\n27\n28\n29\n30\n31\n32\n33\n34\n35\n36\n37\n38\n39\n40\n41\n42\n43\n44\n45\n46\n47'
+                    }
+                ];
+                
+                localStorage.setItem('rollCallFiles', JSON.stringify(exampleFiles));
+                
+                const modes = exampleFiles.map(file => ({
+                    id: file.id,
+                    name: file.name.replace('.txt', ''),
+                    file: file.name
+                }));
+                
+                renderModeList(modes);
+            }
+        }
+
+        // Render the mode list.
+        function renderModeList(modes) {
+            modeList.innerHTML = '';
+            
+            modes.forEach(mode => {
+                const modeItem = document.createElement('div');
+                modeItem.className = `p-3 rounded-lg cursor-pointer transition-colors ${currentMode === mode.id ? 'bg-primary text-white' : 'bg-gray-700 hover:bg-gray-600 text-white'}`;
+                modeItem.dataset.modeId = mode.id;
+                modeItem.dataset.modeFile = mode.file;
+                modeItem.innerHTML = `
+                    <div class="flex items-center justify-between">
+                        <span>${mode.name}</span>
+                        <i class="fa ${currentMode === mode.id ? 'fa-check-circle' : 'fa-circle-o'}"></i>
+                    </div>
+                `;
+                modeItem.addEventListener('click', () => selectMode(mode.id, mode.name, mode.file));
+                modeList.appendChild(modeItem);
+            });
+        }
+
+        // Select a roll-call mode.
+        function selectMode(modeId, modeName, modeFile) {
+            currentMode = modeId;
+            currentModeElement.textContent = modeName;
+            
+            // Re-render the mode list to update the selected state.
+            loadModes();
+            
+            // Load the student list.
+            loadStudents(modeFile);
+        }
+
+        // Load the student list.
+        function loadStudents(fileName) {
+            // Load files from localStorage.
+            const storedFiles = localStorage.getItem('rollCallFiles');
+            
+            if (!storedFiles) {
+                selectionStatus.textContent = 'No student list file found';
+                selectionStatus.className = 'text-red-400';
+                return;
+            }
+            
+            const files = JSON.parse(storedFiles);
+            const file = files.find(f => f.name === fileName);
+            
+            if (!file) {
+                selectionStatus.textContent = `File not found: ${fileName}`;
+                selectionStatus.className = 'text-red-400';
+                return;
+            }
+            
+            // Reset the state.
+            students = [];
+            remainingStudents = [];
+            calledStudents = [];
+            historyIndex = -1;
+            tempStudents = [];
+            
+            // Load the student list from the file.
+            students = file.content.split('\n').filter(name => name.trim() !== '');
+            
+            // Initialize the remaining-students list.
+            remainingStudents = [...students];
+            
+            // Update the display.
+            updateDisplay();
+            updateStatistics();
+            renderHistoryList();
+            
+            // Update the status.
+            selectionStatus.textContent = 'Student list loaded';
+            selectionStatus.className = 'text-green-400';
+            
+            // Enable the buttons.
+            randomStudentBtn.disabled = false;
+            resetAllBtn.disabled = false;
+            prevStudentBtn.disabled = true;
+            nextStudentBtn.disabled = true;
+        }
+
+        // Pick a student at random.
+        function randomStudent() {
+            if (remainingStudents.length === 0) {
+                selectionStatus.textContent = 'All students have been called';
+                selectionStatus.className = 'text-yellow-400';
+                return;
+            }
+            
+            // Select a random student from the remaining list.
+            const randomIndex = Math.floor(Math.random() * remainingStudents.length);
+            const selectedStudent = remainingStudents[randomIndex];
+            
+            // Move the selected student to the called list.
+            calledStudents.push(selectedStudent);
+            remainingStudents.splice(randomIndex, 1);
+            
+            // Update the history index.
+            historyIndex = calledStudents.length - 1;
+            
+            // Update the display.
+            updateDisplay();
+            updateStatistics();
+            renderHistoryList();
+            
+            // Update the status.
+            selectionStatus.textContent = 'Student selected at random';
+            selectionStatus.className = 'text-green-400';
+            
+            // Add an animation.
+            displayName.classList.remove('animate-bounce-in');
+            void displayName.offsetWidth; // Trigger reflow.
+            displayName.classList.add('animate-bounce-in');
+            
+            // Update button states.
+            prevStudentBtn.disabled = calledStudents.length <= 1;
+            nextStudentBtn.disabled = true;
+        }
+
+        // Previous student.
+        function prevStudent() {
+            if (historyIndex > 0) {
+                historyIndex--;
+                updateDisplay();
+                
+                // Update the status.
+                selectionStatus.textContent = 'Viewing history';
+                selectionStatus.className = 'text-blue-400';
+                
+                // Update button states.
+                prevStudentBtn.disabled = historyIndex === 0;
+                nextStudentBtn.disabled = false;
+            }
+        }
+
+        // Next student.
+        function nextStudent() {
+            if (historyIndex < calledStudents.length - 1) {
+                historyIndex++;
+                updateDisplay();
+                
+                // Update the status.
+                selectionStatus.textContent = 'Viewing history';
+                selectionStatus.className = 'text-blue-400';
+                
+                // Update button states.
+                prevStudentBtn.disabled = false;
+                nextStudentBtn.disabled = historyIndex === calledStudents.length - 1;
+            }
+        }
+
+        // Reset roll call.
+        function resetRollCall() {
+            // Show the confirmation dialog.
+            resetModal.classList.remove('hidden');
+        }
+
+        // Confirm reset.
+        function confirmReset() {
+            // Reset the state.
+            remainingStudents = [...students, ...tempStudents];
+            calledStudents = [];
+            historyIndex = -1;
+            
+            // Update the display.
+            displayName.textContent = '--';
+            nameNumber.textContent = '0';
+            updateStatistics();
+            renderHistoryList();
+            
+            // Update the status.
+            selectionStatus.textContent = 'Roll call reset';
+            selectionStatus.className = 'text-green-400';
+            
+            // Update button states.
+            prevStudentBtn.disabled = true;
+            nextStudentBtn.disabled = true;
+            
+            // Hide the dialog.
+            resetModal.classList.add('hidden');
+        }
+
+        // Add a temporary student.
+        function addTempStudent() {
+            const name = tempStudentInput.value.trim();
+            
+            if (name && currentMode) {
+                // Check whether the student already exists.
+                if (students.includes(name) || tempStudents.includes(name)) {
+                    selectionStatus.textContent = 'This student already exists';
+                    selectionStatus.className = 'text-red-400';
+                    return;
+                }
+                
+                // Add the student to the temporary list.
+                tempStudents.push(name);
+                remainingStudents.push(name);
+                
+                // Update the display.
+                updateStatistics();
+                
+                // Clear the input field.
+                tempStudentInput.value = '';
+                
+                // Update the status.
+                selectionStatus.textContent = `Temporary student added: ${name}`;
+                selectionStatus.className = 'text-green-400';
+            }
+        }
+
+        // Update the display.
+        function updateDisplay() {
+            if (calledStudents.length > 0 && historyIndex >= 0) {
+                displayName.textContent = calledStudents[historyIndex];
+                nameNumber.textContent = historyIndex + 1;
+            } else {
+                displayName.textContent = '--';
+                nameNumber.textContent = '0';
+            }
+        }
+
+        // Update the statistics.
+        function updateStatistics() {
+            const total = students.length + tempStudents.length;
+            const called = calledStudents.length;
+            const remaining = total - called;
+            
+            totalCount.textContent = total;
+            calledCount.textContent = called;
+            remainingCount.textContent = remaining;
+        }
+
+        // Render the history list.
+        function renderHistoryList() {
+            historyList.innerHTML = '';
+            
+            if (calledStudents.length === 0) {
+                historyList.innerHTML = '<p class="text-gray-400 text-center italic">No records yet</p>';
+                return;
+            }
+            
+            calledStudents.forEach((student, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = `flex items-center justify-between py-1 px-2 rounded ${index === historyIndex ? 'bg-primary bg-opacity-10 text-primary' : 'hover:bg-gray-700'}`;
+                historyItem.innerHTML = `
+                    <span class="font-medium">${index + 1}. ${student}</span>
+                    <span class="text-xs text-gray-400">${new Date().toLocaleTimeString()}</span>
+                `;
+                historyList.appendChild(historyItem);
+            });
+            
+            // Scroll to the bottom.
+            historyList.scrollTop = historyList.scrollHeight;
+        }
+
+        // Set up event listeners.
+        function setupEventListeners() {
+            // Button events.
+            randomStudentBtn.addEventListener('click', randomStudent);
+            prevStudentBtn.addEventListener('click', prevStudent);
+            nextStudentBtn.addEventListener('click', nextStudent);
+            resetAllBtn.addEventListener('click', resetRollCall);
+            cancelResetBtn.addEventListener('click', () => resetModal.classList.add('hidden'));
+            confirmResetBtn.addEventListener('click', confirmReset);
+            
+            // Add a temporary student.
+            addTempBtn.addEventListener('click', addTempStudent);
+            tempStudentInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    addTempStudent();
+                }
+            });
+            
+            // Disable buttons initially.
+            randomStudentBtn.disabled = true;
+            resetAllBtn.disabled = true;
+            prevStudentBtn.disabled = true;
+            nextStudentBtn.disabled = true;
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,9 @@
+{
+  "id": "wg_calculator",
+  "name": "Calculator",
+  "icon": "ico/calculator.svg",
+  "path": "apps/calculator/index.html",
+  "color": "#C7BEE6",
+  "category": "Tools",
+  "developer": "Wildgoose"
+}

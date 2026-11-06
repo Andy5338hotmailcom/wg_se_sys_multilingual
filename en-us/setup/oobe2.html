@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Choose a theme - Wildgoose OOBE</title>
+<style>
+* {margin:0;padding:0;box-sizing:border-box;font-family:Microsoft YaHei,sans-serif;}
+body {
+    background: linear-gradient(120deg, #e8dff8, #f3eafb);
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.title-text {
+    position: absolute;
+    top: 80px;
+    left: 60px;
+    animation: fadeInUp 1.2s ease-out;
+}
+.title-text h1 {
+    color: #4b2e83;
+    font-size: 36px;
+    font-weight: 600;
+}
+.title-text p {
+    color: #6b4e99;
+    margin-top: 12px;
+    font-size: 18px;
+}
+
+/* Center the button container */
+.theme-container {
+    display: flex;
+    gap: 30px;
+    animation: fadeInUp 1.2s 0.2s both;
+}
+
+/* Light theme button: white background, black text */
+.theme-btn-light {
+    width: 200px;
+    height: 70px;
+    border: none;
+    border-radius: 16px;
+    background: #ffffff;
+    color: #000000;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+/* Dark theme button: black background, white text */
+.theme-btn-dark {
+    width: 200px;
+    height: 70px;
+    border: none;
+    border-radius: 16px;
+    background: #000000;
+    color: #ffffff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+
+.theme-btn-light:hover, .theme-btn-dark:hover {
+    transform: scale(1.05);
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(25px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="title-text">
+    <h1>Choose a theme</h1>
+    <p>Wildgoose Second Edition</p>
+</div>
+
+<div class="theme-container">
+    <button class="theme-btn-light" onclick="selectTheme('w')">Light mode</button>
+    <button class="theme-btn-dark" onclick="selectTheme('b')">Dark mode</button>
+</div>
+
+<script>
+function selectTheme(mode) {
+    localStorage.setItem("WG_color", mode);
+    location.href = "oobe3.html";
+}
+</script>
+
+</body>
+</html>

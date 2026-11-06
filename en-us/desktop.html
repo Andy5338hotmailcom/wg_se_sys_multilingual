@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wildgoose OS</title>
+    <link id="desktop-theme" rel="stylesheet">
+    <script>
+        let theme = localStorage.getItem("WG_color");
+        if (!theme) {
+            theme = "w";
+            localStorage.setItem("WG_color", theme);
+        }
+        document.getElementById("desktop-theme").href =
+            theme === "w" ? "whitedesktop.css" : "blackdesktop.css";
+
+        const defaultDesktopWallpaper = "./wallpaper/wildgoose/bg.jpg";
+        const defaultDesktopWallpaperTime = 60;
+        const getDesktopWallpaperTime = value => {
+            const seconds = Number(value);
+            return Number.isInteger(seconds) && seconds >= 1
+                ? seconds
+                : defaultDesktopWallpaperTime;
+        };
+        let desktopWallpaperTimer = null;
+        let desktopWallpaperPaths = [];
+        let desktopWallpaperIndex = 0;
+        window.applyDesktopWallpaper = (wallpaper, interval) => {
+            desktopWallpaperPaths = (wallpaper || defaultDesktopWallpaper)
+                .split(",")
+                .map(path => path.trim())
+                .filter(Boolean);
+            if (desktopWallpaperPaths.length === 0) {
+                desktopWallpaperPaths = [defaultDesktopWallpaper];
+            }
+            desktopWallpaperIndex = 0;
+            const applyCurrentWallpaper = () => {
+                document.documentElement.style.setProperty(
+                    "--desktop-wallpaper",
+                    `url(${JSON.stringify(desktopWallpaperPaths[desktopWallpaperIndex])})`
+                );
+            };
+            applyCurrentWallpaper();
+            if (desktopWallpaperTimer !== null) {
+                clearInterval(desktopWallpaperTimer);
+                desktopWallpaperTimer = null;
+            }
+            const switchTime = getDesktopWallpaperTime(
+                interval || localStorage.getItem("WG_desktop_wallpaper_time")
+            );
+            if (desktopWallpaperPaths.length > 1) {
+                desktopWallpaperTimer = setInterval(() => {
+                    desktopWallpaperIndex = (desktopWallpaperIndex + 1) % desktopWallpaperPaths.length;
+                    applyCurrentWallpaper();
+                }, switchTime * 1000);
+            }
+        };
+        let desktopWallpaper = localStorage.getItem("WG_desktop_wallpaper");
+        if (desktopWallpaper === null) {
+            desktopWallpaper = defaultDesktopWallpaper;
+            localStorage.setItem("WG_desktop_wallpaper", desktopWallpaper);
+        }
+        let desktopWallpaperTime = String(
+            getDesktopWallpaperTime(localStorage.getItem("WG_desktop_wallpaper_time"))
+        );
+        if (localStorage.getItem("WG_desktop_wallpaper_time") !== desktopWallpaperTime) {
+            localStorage.setItem("WG_desktop_wallpaper_time", desktopWallpaperTime);
+        }
+        window.applyDesktopWallpaper(desktopWallpaper, desktopWallpaperTime);
+        window.addEventListener("storage", event => {
+            if (event.key === "WG_desktop_wallpaper") {
+                desktopWallpaper = event.newValue || defaultDesktopWallpaper;
+                if (event.newValue === null) {
+                    localStorage.setItem("WG_desktop_wallpaper", desktopWallpaper);
+                }
+                window.applyDesktopWallpaper(
+                    desktopWallpaper,
+                    localStorage.getItem("WG_desktop_wallpaper_time")
+                );
+            } else if (event.key === "WG_desktop_wallpaper_time") {
+                desktopWallpaperTime = String(getDesktopWallpaperTime(event.newValue));
+                if (event.newValue !== desktopWallpaperTime) {
+                    localStorage.setItem("WG_desktop_wallpaper_time", desktopWallpaperTime);
+                }
+                window.applyDesktopWallpaper(desktopWallpaper, desktopWallpaperTime);
+            }
+        });
+    </script>
+    <script src="desktop.js"></script>
+</head>
+<body>
+
+<!-- ======================== -->
+<!-- 1. Desktop icons -->
+<!-- ======================== -->
+<div id="desktop-icons"></div>
+
+<!-- ======================== -->
+<!-- 2. Taskbar -->
+<!-- ======================== -->
+<div class="taskbar">
+    <button class="start-btn">Start</button>
+    <div class="task-apps"></div>
+    <div class="task-right">
+        <div class="show-desktop">Show desktop</div>
+        <div class="time" id="time"></div>
+    </div>
+</div>
+
+<!-- ======================== -->
+<!-- 3. Start menu (iframe container; main logic is in startmenu.html) -->
+<!-- ======================== -->
+<div class="start-menu" id="startMenu">
+    <iframe id="startMenuFrame" src="startmenu.html" title="Start menu"></iframe>
+</div>
+
+<!-- ======================== -->
+<!-- 4. Window container -->
+<!-- ======================== -->
+<div id="window-container"></div>
+
+<script>
+    window.addEventListener("keydown", event => {
+        if (event.key !== "Meta" && event.code !== "MetaLeft" && event.code !== "MetaRight"
+            && event.keyCode !== 91 && event.keyCode !== 92) return;
+        if (event.repeat) return;
+
+        const startButton = document.querySelector(".start-btn");
+        if (startButton) startButton.click();
+    });
+</script>
+
+</body>
+</html>

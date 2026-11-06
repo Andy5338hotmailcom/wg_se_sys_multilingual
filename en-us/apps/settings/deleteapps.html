@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>App uninstaller</title>
+    <script src="settings-theme.js"></script>
+    <link rel="stylesheet" href="settings.css">
+</head>
+<body class="uninstall-page">
+    <h2 class="title">Wildgoose App Uninstaller</h2>
+    <div class="app-list" id="appList"></div>
+    <div class="tip">Refresh the desktop after uninstalling an app to apply the change.</div>
+
+    <script>
+        function loadInstalledApps() {
+            const list = JSON.parse(localStorage.getItem('app_list') || '[]');
+            const appList = document.getElementById('appList');
+            appList.innerHTML = '';
+
+            list.forEach(app => {
+                const item = document.createElement('div');
+                item.className = 'app-item';
+                item.innerHTML = `
+                    <div class="app-name">${app.name}</div>
+                    <button class="uninstall-btn" onclick="uninstall('${app.id}')">Uninstall</button>
+                `;
+                appList.appendChild(item);
+            });
+        }
+
+        function uninstall(appId) {
+            if (!confirm('Are you sure you want to uninstall this app?')) return;
+
+            let list = JSON.parse(localStorage.getItem('app_list') || '[]');
+            list = list.filter(item => item.id !== appId);
+            localStorage.setItem('app_list', JSON.stringify(list));
+
+            let desk = JSON.parse(localStorage.getItem('desktopIcons') || '[]');
+            desk = desk.filter(id => id !== appId);
+            localStorage.setItem('desktopIcons', JSON.stringify(desk));
+
+            loadInstalledApps();
+            alert('✅ App uninstalled successfully. Refresh the desktop to apply the change.');
+        }
+
+        loadInstalledApps();
+    </script>
+</body>
+</html>

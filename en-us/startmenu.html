@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Start menu</title>
+    <script>
+        document.documentElement.dataset.theme =
+            localStorage.getItem("WG_color") === "b" ? "b" : "w";
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        :root {
+            --bg: rgba(255, 255, 255, 0.94);
+            --text: #1f1f1f;
+            --muted: #666666;
+            --hover: rgba(0, 0, 0, 0.07);
+            --input-bg: rgba(0, 0, 0, 0.05);
+            --input-border: rgba(0, 0, 0, 0.12);
+            --separator: rgba(0, 0, 0, 0.12);
+            --bar-bg: rgba(0, 0, 0, 0.04);
+            --thumb: rgba(0, 0, 0, 0.2);
+        }
+        html[data-theme="b"] {
+            --bg: rgba(30, 30, 30, 0.94);
+            --text: #eaeaea;
+            --muted: #9a9a9a;
+            --hover: rgba(255, 255, 255, 0.08);
+            --input-bg: rgba(255, 255, 255, 0.08);
+            --input-border: rgba(255, 255, 255, 0.16);
+            --separator: rgba(255, 255, 255, 0.14);
+            --bar-bg: rgba(255, 255, 255, 0.05);
+            --thumb: rgba(255, 255, 255, 0.25);
+        }
+        body {
+            width: 100%;
+            height: 100vh;
+            background: var(--bg);
+            color: var(--text);
+            backdrop-filter: blur(22px);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .start-bar {
+            display: flex;
+            align-items: center;
+            padding: 10px 12px;
+            background: var(--bar-bg);
+            border-bottom: 1px solid var(--separator);
+            flex-shrink: 0;
+        }
+        .start-bar .title {
+            font-size: 16px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            white-space: nowrap;
+            min-width: 0;
+        }
+        .start-bar .title .logo {
+            width: 20px;
+            height: 20px;
+            object-fit: contain;
+            flex-shrink: 0;
+        }
+        .start-body {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+        }
+        .search-box {
+            padding: 12px 14px 10px;
+            flex-shrink: 0;
+        }
+        #appSearch {
+            width: 100%;
+            padding: 11px 14px;
+            border-radius: 9px;
+            border: 1px solid var(--input-border);
+            background: var(--input-bg);
+            color: var(--text);
+            font-size: 14px;
+            outline: none;
+        }
+        #appSearch:focus {
+            background: var(--hover);
+        }
+        .start-main {
+            flex: 1;
+            display: flex;
+            overflow: hidden;
+        }
+        .start-left {
+            width: 260px;
+            flex-shrink: 0;
+            border-right: 1px solid var(--separator);
+            padding: 12px;
+            overflow-y: auto;
+        }
+        .start-right {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            min-width: 0;
+        }
+        .section-title {
+            font-size: 12px;
+            color: var(--muted);
+            font-weight: 600;
+            margin-bottom: 8px;
+            padding-left: 4px;
+        }
+        .fixed-apps {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px 8px;
+        }
+        .fixed-apps .app-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 6px;
+            padding: 10px 4px;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        .fixed-apps .app-item:hover {
+            background: var(--hover);
+        }
+        .fixed-apps .app-item img {
+            width: 32px;
+            height: 32px;
+            object-fit: contain;
+        }
+        .fixed-apps .app-item .name {
+            font-size: 12px;
+            text-align: center;
+            line-height: 1.2;
+            max-width: 100%;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+        .all-apps-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 12px 14px 8px;
+            gap: 10px;
+        }
+        .letter-index {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px;
+            justify-content: flex-end;
+        }
+        .letter-index span {
+            font-size: 12px;
+            color: var(--muted);
+            padding: 2px 6px;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        .letter-index span:hover {
+            background: var(--hover);
+            color: var(--text);
+        }
+        .letter-index span.active {
+            color: var(--text);
+            background: var(--hover);
+        }
+        .all-apps {
+            flex: 1;
+            overflow-y: auto;
+            padding: 4px 12px 12px;
+        }
+        .all-apps .letter-group {
+            margin-bottom: 12px;
+        }
+        .all-apps .letter-title {
+            font-size: 12px;
+            color: var(--muted);
+            padding: 4px 6px;
+            border-bottom: 1px solid var(--separator);
+            margin-bottom: 4px;
+        }
+        .all-apps .app-item {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 10px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 14px;
+        }
+        .all-apps .app-item:hover {
+            background: var(--hover);
+        }
+        .all-apps .app-item img {
+            width: 22px;
+            height: 22px;
+            object-fit: contain;
+        }
+        .start-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 10px;
+            padding: 10px 14px;
+            border-top: 1px solid var(--separator);
+            background: var(--bar-bg);
+            flex-shrink: 0;
+        }
+        .footer-left {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 0;
+        }
+        .user-avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: var(--input-bg);
+        }
+        .user-name {
+            font-size: 13px;
+            color: var(--text);
+        }
+        .footer-right {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .footer-icon {
+            border: none;
+            background: transparent;
+            color: var(--text);
+            font-size: 15px;
+            padding: 6px 8px;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+        .footer-icon:hover {
+            background: var(--hover);
+        }
+        .power-btn {
+            padding: 6px 10px;
+            border: none;
+            border-radius: 7px;
+            color: white;
+            cursor: pointer;
+            font-size: 12px;
+            white-space: nowrap;
+        }
+        .power-btn.restart { background: #555555; }
+        .power-btn.shutdown { background: #d32f2f; }
+        .power-btn.logout { background: #666666; }
+        .power-btn.reflash { background: #444444; }
+        .start-left::-webkit-scrollbar,
+        .all-apps::-webkit-scrollbar { width: 6px; }
+        .start-left::-webkit-scrollbar-thumb,
+        .all-apps::-webkit-scrollbar-thumb {
+            background: var(--thumb);
+            border-radius: 99px;
+        }
+        .start-left::-webkit-scrollbar-track,
+        .all-apps::-webkit-scrollbar-track { background: transparent; }
+        .empty {
+            color: var(--muted);
+            font-size: 13px;
+            text-align: center;
+            padding: 20px 0;
+        }
+        @media (max-width: 640px) {
+            .start-left {
+                width: 200px;
+                padding: 10px;
+            }
+            .fixed-apps {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .user-name {
+                display: none;
+            }
+            .power-btn {
+                padding: 5px 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="start-bar">
+        <div class="title">
+            <img class="logo" id="startLogo" alt="Start">
+            <span>Start</span>
+        </div>
+    </div>
+    <div class="start-body">
+        <div class="search-box">
+            <input type="text" id="appSearch" placeholder="Search apps" oninput="renderApps()" onkeydown="searchKeydown(event)">
+        </div>
+        <div class="start-main">
+            <div class="start-left">
+                <div class="section-title">Pinned</div>
+                <div class="fixed-apps" id="fixedApps"></div>
+            </div>
+            <div class="start-right">
+                <div class="all-apps-header">
+                    <div class="section-title">All apps</div>
+                    <div class="letter-index" id="letterIndex"></div>
+                </div>
+                <div class="all-apps" id="allApps"></div>
+            </div>
+        </div>
+    </div>
+    <div class="start-footer">
+        <div class="footer-left">
+            <img class="user-avatar" id="userAvatar" alt="User">
+            <span class="user-name">Wildgoose</span>
+        </div>
+        <div class="footer-right">
+            <button class="footer-icon" title="Settings" onclick="openSettings()">⚙️</button>
+            <button class="power-btn restart"  onclick="power('restart')">Restart</button>
+            <button class="power-btn shutdown" onclick="power('shutdown')">Shut down</button>
+            <button class="power-btn logout"   onclick="power('logout')">Sign out</button>
+            <!-- <button class="power-btn reflash"  onclick="power('reflash')">Refresh desktop</button> -->
+            <!-- <button class="power-btn reflash"  onclick="power('restore')">Return to the stable version</button> -->
+        </div>
+    </div>
+<script>
+const LOCALE = "en-US";
+let APPS = [];
+
+// ========== Fixed icon paths ==========
+const START_LOGO_PATH = "./apps.png";    // Start menu icon in the upper-left corner.
+const USER_AVATAR_PATH = "./icon.png";    // User avatar in the footer.
+
+// Load the fixed header and footer icons.
+document.getElementById("startLogo").src = START_LOGO_PATH;
+document.getElementById("userAvatar").src = USER_AVATAR_PATH;
+
+function getFirstLetter(name) {
+    try {
+        const s = name.trim();
+        if (!s) return "#";
+        const c = s[0];
+        if (/[a-zA-Z]/.test(c)) {
+            return c.toUpperCase();
+        }
+    } catch(err) {
+        console.warn("Failed to determine the initial letter.", err);
+    }
+    return "#";
+}
+
+function getLocalApps() {
+    try { return JSON.parse(localStorage.getItem("app_list")) || []; }
+    catch (e) { return []; }
+}
+function mergeAppList() {
+    const local = getLocalApps();
+    const result = [...APPS];
+    for (const app of local) {
+        if (!app.id) continue;
+        if (!result.some(i => i.id === app.id)) result.push(app);
+    }
+    return result;
+}
+function getFixed() {
+    try { return JSON.parse(localStorage.getItem("fixedApps")) || []; }
+    catch (e) { return []; }
+}
+
+function createItem(app) {
+    const item = document.createElement("div");
+    item.className = "app-item";
+
+    const img = document.createElement("img");
+    img.alt = app.name;
+    // Read the app icon from app.icon (for example, icon: "./icon.png").
+    if(app.icon){
+        img.setAttribute("src", app.icon);
+    }
+    const nameSpan = document.createElement("div");
+    nameSpan.className = "name";
+    nameSpan.textContent = app.name;
+
+    item.appendChild(img);
+    item.appendChild(nameSpan);
+
+    item.onclick = () => {
+        parent.postMessage({ action: "openApp", appId: app.id }, "*");
+    };
+    item.oncontextmenu = (e) => {
+        e.preventDefault();
+        parent.postMessage({
+            action: "startmenu-contextmenu",
+            appId: app.id,
+            x: e.clientX,
+            y: e.clientY
+        }, "*");
+    };
+    return item;
+}
+
+function renderFixed() {
+    const box = document.getElementById("fixedApps");
+    box.innerHTML = "";
+    const fixed = getFixed();
+    const list = mergeAppList();
+    if (!fixed.length) {
+        box.innerHTML = `<div class="empty">(No pinned apps)</div>`;
+        return;
+    }
+    fixed.forEach(id => {
+        const app = list.find(a => a.id === id);
+        if (app) box.appendChild(createItem(app));
+    });
+}
+
+function renderAllApps() {
+    const box = document.getElementById("allApps");
+    const letterBox = document.getElementById("letterIndex");
+    const key = document.getElementById("appSearch").value.toLowerCase();
+    box.innerHTML = "";
+    letterBox.innerHTML = "";
+
+    let list = mergeAppList().filter(a =>
+        !key || a.name.toLowerCase().includes(key)
+    );
+    if (!list.length) {
+        box.innerHTML = `<div class="empty">No matching apps found</div>`;
+        return;
+    }
+    list.sort((a, b) => a.name.localeCompare(b.name, LOCALE));
+
+    const groups = {};
+    list.forEach(app => {
+        const letter = getFirstLetter(app.name);
+        if (!groups[letter]) groups[letter] = [];
+        groups[letter].push(app);
+    });
+    let sortedLetters = Object.keys(groups).sort((a, b) => {
+        if (a === "#") return 1;
+        if (b === "#") return -1;
+        return a.localeCompare(b);
+    });
+
+    sortedLetters.forEach(letter => {
+        const span = document.createElement("span");
+        span.textContent = letter;
+        span.dataset.letter = letter;
+        span.onclick = () => scrollToLetter(letter);
+        letterBox.appendChild(span);
+    });
+
+    sortedLetters.forEach(letter => {
+        const group = document.createElement("div");
+        group.className = "letter-group";
+        group.dataset.letter = letter;
+        const title = document.createElement("div");
+        title.className = "letter-title";
+        title.textContent = letter;
+        group.appendChild(title);
+        groups[letter].forEach(app => {
+            group.appendChild(createItem(app));
+        });
+        box.appendChild(group);
+    });
+}
+
+function renderApps() {
+    try {
+        renderFixed();
+        renderAllApps();
+    } catch(e) {
+        console.error("Rendering error:", e);
+    }
+}
+
+function scrollToLetter(letter) {
+    const group = document.querySelector(`.letter-group[data-letter="${letter}"]`);
+    if (group) {
+        group.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
+    document.querySelectorAll(".letter-index span").forEach(el => {
+        el.classList.toggle("active", el.dataset.letter === letter);
+    });
+}
+
+function searchKeydown(e) {
+    if (e.key === "Enter") {
+        const key = document.getElementById("appSearch").value.toLowerCase();
+        let list = mergeAppList().filter(a =>
+            !key || a.name.toLowerCase().includes(key)
+        );
+        list.sort((a, b) => a.name.localeCompare(b.name, LOCALE));
+        if (list[0]) {
+            parent.postMessage({ action: "openApp", appId: list[0].id }, "*");
+        }
+    }
+}
+
+function openSettings() {
+    parent.postMessage({ action: "openApp", appId: "setting" }, "*");
+}
+function power(cmd) {
+    parent.postMessage({ action: "power", cmd: cmd }, "*");
+}
+
+window.addEventListener("message", function (e) {
+    const d = e.data;
+    if (d && d.type === "theme-change" && (d.theme === "w" || d.theme === "b")) {
+        document.documentElement.dataset.theme = d.theme;
+        return;
+    }
+    if (d && d.type === "startmenu-init" && Array.isArray(d.apps)) {
+        APPS = d.apps;
+        if (Array.isArray(d.fixed)) {
+            localStorage.setItem("fixedApps", JSON.stringify(d.fixed));
+        }
+        renderApps();
+    }
+});
+parent.postMessage({ action: "startmenu-request" }, "*");
+</script>
+</body>
+</html>

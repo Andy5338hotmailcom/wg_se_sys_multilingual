@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Wildgoose OOBE</title>
+<style>
+* {margin:0;padding:0;box-sizing:border-box;font-family:Microsoft YaHei,sans-serif;}
+body {
+    /* Pale purple background. */
+    background: linear-gradient(120deg, #e8dff8, #f3eafb);
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+}
+
+/* Upper-left fade and slide animation */
+.welcome-text {
+    position: absolute;
+    top: 80px;
+    left: 60px;
+    animation: fadeInUp 1.2s ease-out;
+}
+.welcome-text h1 {
+    color: #4b2e83;
+    font-size: 36px;
+    font-weight: 600;
+}
+.welcome-text p {
+    color: #6b4e99;
+    margin-top: 12px;
+    font-size: 18px;
+}
+
+/* Centered gradient button */
+.start-btn {
+    position: absolute;
+    left: 50%;
+    top: 55%;
+    transform: translate(-50%,-50%);
+    padding: 14px 40px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(90deg, #9c7cdd, #b198ee);
+    color: #fff;
+    font-size: 17px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+}
+.start-btn:hover {
+    opacity: 0.92;
+    transform: translate(-50%,-50%) scale(1.03);
+}
+
+/* Upper-left slide animation */
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(25px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+</style>
+</head>
+<body>
+
+<div class="welcome-text">
+    <h1>Getting started</h1>
+    <p>Wildgoose Second Edition</p>
+</div>
+
+<button class="start-btn" onclick="location.href='oobe5.html'">
+    Let's install the software
+</button>
+
+</body>
+</html>

@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>More startup options</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#9333ea',
+                        secondary: '#a855f7',
+                        accent: '#c084fc',
+                        light: '#f3e8ff',
+                        dark: '#4c1d95'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    },
+                    boxShadow: {
+                        'glass': '0 8px 32px 0 rgba(31, 38, 135, 0.15)',
+                        'neon': '0 0 5px theme("colors.accent"), 0 0 20px theme("colors.accent")'
+                    },
+                    animation: {
+                        'float': 'float 3s ease-in-out infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite'
+                    },
+                    keyframes: {
+                        float: {
+                            '0%, 100%': { transform: 'translateY(0)' },
+                            '50%': { transform: 'translateY(-10px)' }
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass-effect {
+                @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-glass;
+            }
+            .btn-hover {
+                @apply transition-all duration-300 hover:shadow-neon hover:scale-105;
+            }
+            .text-gradient {
+                @apply bg-clip-text text-transparent bg-gradient-to-r from-primary to-accent;
+            }
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-center bg-gradient-to-br from-light to-secondary p-4">
+    <!-- Main container -->
+    <div class="w-full max-w-md glass-effect rounded-2xl p-8 animate-float">
+        <!-- Title -->
+        <h1 class="text-[clamp(2rem,5vw,3rem)] font-bold text-center mb-10 text-gradient">
+            <i class="fa fa-ellipsis-h mr-3"></i>More startup options
+        </h1>
+        
+        <!-- Options -->
+        <div class="space-y-4">
+            <!-- Safe mode -->
+            <div class="glass-effect rounded-xl p-5 btn-hover cursor-pointer">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-4">
+                        <i class="fa fa-shield text-xl text-primary"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-semibold text-white">Safe mode</h2>
+                        <p class="text-light/80 text-xs">Start with a minimal set of drivers</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Safe mode with networking -->
+            <div class="glass-effect rounded-xl p-5 btn-hover cursor-pointer">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-4">
+                        <i class="fa fa-wifi text-xl text-primary"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-semibold text-white">Safe mode with networking</h2>
+                        <p class="text-light/80 text-xs">Safe mode with network support</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Command prompt -->
+            <div class="glass-effect rounded-xl p-5 btn-hover cursor-pointer">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-4">
+                        <i class="fa fa-terminal text-xl text-primary"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-semibold text-white">Command prompt</h2>
+                        <p class="text-light/80 text-xs">Advanced command-line tools</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- System restore -->
+            <div class="glass-effect rounded-xl p-5 btn-hover cursor-pointer">
+                <div class="flex items-center">
+                    <div class="w-10 h-10 rounded-full bg-primary/20 flex items-center justify-center mr-4">
+                        <i class="fa fa-undo text-xl text-primary"></i>
+                    </div>
+                    <div>
+                        <h2 class="text-lg font-semibold text-white">System restore</h2>
+                        <p class="text-light/80 text-xs">Restore the system to an earlier state</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Back button -->
+        <div class="mt-8">
+            <button class="w-full glass-effect text-white py-3 rounded-lg btn-hover flex items-center justify-center" onclick="window.location.href='../syschoice.html'">
+                <i class="fa fa-arrow-left mr-2"></i>Back to main menu
+            </button>
+        </div>
+    </div>
+    
+    <!-- Decorative elements -->
+    <div class="fixed top-10 left-10 w-20 h-20 rounded-full bg-primary/10 blur-xl animate-pulse-slow"></div>
+    <div class="fixed bottom-10 right-10 w-32 h-32 rounded-full bg-accent/10 blur-xl animate-pulse-slow" style="animation-delay: 1s;"></div>
+</body>
+</html>

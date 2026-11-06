@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>System update</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#3b82f6',
+                        secondary: '#60a5fa',
+                        dark: '#1e3a8a',
+                        light: '#eff6ff'
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .glass-effect {
+                background: rgba(255, 255, 255, 0.1);
+                backdrop-filter: blur(10px);
+                -webkit-backdrop-filter: blur(10px);
+                border: 1px solid rgba(255, 255, 255, 0.2);
+            }
+            .text-shadow {
+                text-shadow: 0 2px 4px rgba(0, 0, 0, 0.3);
+            }
+            .progress-bar {
+                transition: width 0.5s ease-in-out;
+            }
+        }
+    </style>
+    <style>
+        body {
+            background-image: url('../../wallpaper/wildgoose/bg.jpg');
+            background-size: cover;
+            background-position: center;
+            background-repeat: no-repeat;
+            min-height: 100vh;
+            font-family: 'Inter', system-ui, sans-serif;
+        }
+        .step {
+            display: none;
+        }
+        .step.active {
+            display: block;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .button-hover {
+            transition: all 0.3s ease;
+        }
+        .button-hover:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .img-wrap {
+            position: relative;
+            width: 100%;
+            height: min(360px, 45vh);
+            overflow: hidden;
+            border-radius: 12px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .slide-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            opacity: 0;
+            transition: opacity 1.2s ease-in-out;
+        }
+        .slide-img.active {
+            opacity: 1;
+            z-index: 2;
+        }
+        .slide-caption {
+            margin-top: 18px;
+            text-align: center;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 16px;
+            letter-spacing: 0.5px;
+            min-height: 24px;
+        }
+        .install-main-title,
+        .install-status-text {
+            display: none;
+        }
+        /* On short screens, hide images and text and keep the progress bar visible. */
+        @media (max-height: 420px) {
+            .img-wrap, .slide-caption {
+                display: none !important;
+            }
+        }
+    </style>
+</head>
+<body class="flex flex-col items-center justify-center min-h-screen p-4 gap-4">
+
+    <!-- Main setup window -->
+    <div class="w-full max-w-4xl glass-effect rounded-lg shadow-2xl overflow-hidden">
+        <!-- Window title bar -->
+        <div class="bg-dark bg-opacity-70 px-6 py-4 flex items-center justify-between">
+            <div class="flex items-center">
+                <img src="../../icon.png"
+                     class="w-6 h-6 text-primary mr-3 object-contain"
+                     alt="Icon">
+                <h1 class="text-light text-xl font-semibold text-shadow">System update</h1>
+            </div>
+        </div>
+
+        <div class="px-6 py-6">
+            <!-- Step indicators -->
+            <div class="flex justify-between mb-6">
+                <div class="step-indicator flex flex-col items-center" data-step="3">
+                    <div class="w-8 h-8 rounded-full bg-primary text-white flex items-center justify-center mb-2">3</div>
+                    <span class="text-xs text-light">Restart system</span>
+                </div>
+                <div class="flex-1 mx-2 relative">
+                    <div class="absolute top-4 left-0 right-0 h-0.5 bg-gray-600"></div>
+                    <div class="absolute top-4 left-0 h-0.5 bg-primary transition-all duration-500" id="progress-line-1"></div>
+                </div>
+                <div class="step-indicator flex flex-col items-center" data-step="4">
+                    <div class="w-8 h-8 rounded-full bg-gray-600 text-white flex items-center justify-center mb-2" id="step-2-indicator">4</div>
+                    <span class="text-xs text-light">Continue update</span>
+                </div>
+                <div class="flex-1 mx-2 relative">
+                    <div class="absolute top-4 left-0 right-0 h-0.5 bg-gray-600"></div>
+                    <div class="absolute top-4 left-0 h-0.5 bg-primary transition-all duration-500" id="progress-line-2"></div>
+                </div>
+                <div class="step-indicator flex flex-col items-center" data-step="5">
+                    <div class="w-8 h-8 rounded-full bg-gray-600 text-white flex items-center justify-center mb-2" id="step-3-indicator">5</div>
+                    <span class="text-xs text-light">Update complete</span>
+                </div>
+            </div>
+
+            <div class="steps-container">
+                <!-- Step 3: Confirm update -->
+                <div class="step" id="step-1">
+                    <div class="text-center mb-6">
+                        <i class="fa fa-info-circle text-primary text-4xl mb-4"></i>
+                        <h2 class="text-2xl font-bold text-light mb-2">Welcome to the setup wizard</h2>
+                        <p class="text-gray-300">Confirm that you want to update this system. The update will take a few minutes.</p>
+                    </div>
+                    <div class="bg-dark bg-opacity-50 rounded-lg p-4 mb-6">
+                        <h3 class="text-lg font-semibold text-primary mb-3">System information</h3>
+                        <div class="space-y-2 text-gray-300">
+                            <div class="flex justify-between">
+                                <span>System edition:</span>
+                                <span class="font-medium">Wildgoose Second Preview Edition</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Required space:</span>
+                                <span class="font-medium">5 GB</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>System requirements:</span>
+                                <span class="font-medium">8 GB RAM, 64 GB disk space</span>
+                            </div>
+                            <div class="flex justify-between">
+                                <span>Current system:</span>
+                                <span class="font-medium">Meets all requirements</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="flex justify-between">
+                        <button id="cancel-btn" class="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded transition-colors">
+                            Cancel
+                        </button>
+                        <button id="start-install" class="px-6 py-2 bg-primary hover:bg-blue-600 text-white rounded button-hover">
+                            Confirm update
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 4: Update progress -->
+                <div class="step active" id="step-2">
+                    <div class="text-center">
+                        <h2 class="install-main-title text-2xl font-bold text-light mb-2">Updating the system</h2>
+
+                        <div class="img-wrap">
+                            <img class="slide-img active" src="../slide1.png" data-caption="The redesigned Wildgoose Start menu">
+                            <img class="slide-img" src="../slide1.png" data-caption="The redesigned Wildgoose Start menu">
+                            <img class="slide-img" src="../slide2.png" data-caption="Drag a window to a corner or edge to snap it (upper-left corner)">
+                            <img class="slide-img" src="../slide3.png" data-caption="Drag a window to a corner or edge to snap it (left edge)">
+                            <img class="slide-img" src="../slide4.png" data-caption="Drag a window to a corner or edge to snap it (lower-left corner)">
+                            <img class="slide-img" src="../slide5.png" data-caption="Drag a window to a corner or edge to snap it (upper-right corner)">
+                            <img class="slide-img" src="../slide6.png" data-caption="Drag a window to a corner or edge to snap it (right edge)">
+                            <img class="slide-img" src="../slide7.png" data-caption="Drag a window to a corner or edge to snap it (lower-right corner)">
+                            <img class="slide-img" src="../slide8.png" data-caption="Apps can be pinned to the taskbar">
+                            <img class="slide-img" src="../slide8.png" data-caption="Apps can be pinned to the taskbar">
+                            <img class="slide-img" src="../slide1.png" data-caption="The redesigned Wildgoose Start menu">
+                            <img class="slide-img" src="../slide1.png" data-caption="The redesigned Wildgoose Start menu">
+                            <img class="slide-img" src="../slide2.png" data-caption="Drag a window to a corner or edge to snap it (upper-left corner)">
+                            <img class="slide-img" src="../slide3.png" data-caption="Drag a window to a corner or edge to snap it (left edge)">
+                            <img class="slide-img" src="../slide4.png" data-caption="Drag a window to a corner or edge to snap it (lower-left corner)">
+                            <img class="slide-img" src="../slide5.png" data-caption="Drag a window to a corner or edge to snap it (upper-right corner)">
+                            <img class="slide-img" src="../slide6.png" data-caption="Drag a window to a corner or edge to snap it (right edge)">
+                            <img class="slide-img" src="../slide7.png" data-caption="Drag a window to a corner or edge to snap it (lower-right corner)">
+                            <img class="slide-img" src="../slide8.png" data-caption="Apps can be pinned to the taskbar">
+                            <img class="slide-img" src="../slide8.png" data-caption="Apps can be pinned to the taskbar">
+                        </div>
+                        <div class="slide-caption" id="slide-caption">The redesigned Wildgoose Start menu</div>
+
+                        <p class="install-status-text text-gray-300" id="installation-status">Preparing update files...</p>
+                    </div>
+
+                    <div class="flex justify-end mt-4">
+                        <button id="cancel-install" class="px-4 py-2 bg-gray-600 hover:bg-gray-500 text-white rounded transition-colors">
+                            Cancel update
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Step 5: Completion -->
+                <div class="step" id="step-3">
+                    <div class="text-center mb-6">
+                        <i class="fa fa-check-circle text-green-500 mb-4"></i>
+                        <h2 class="text-2xl font-bold text-light mb-2">Update complete</h2>
+                        <p class="text-gray-300">The system was updated successfully. Restart to complete the second stage.</p>
+                    </div>
+                    <div class="flex justify-between">
+                        <button id="restart-now" class="px-6 py-2 bg-green-600 hover:bg-green-500 text-white rounded button-hover">
+                            Continue to stage two
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Standalone progress bar -->
+    <div class="w-full max-w-4xl glass-effect rounded-lg shadow-2xl px-6 py-4">
+        <div class="h-2 bg-gray-700 rounded-full overflow-hidden">
+            <div id="progress-bar" class="h-full bg-primary progress-bar" style="width: 0%"></div>
+        </div>
+        <div class="flex justify-between mt-2 text-sm text-gray-400">
+            <span>0%</span>
+            <span id="progress-percentage">0%</span>
+            <span>100%</span>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const progressBar = document.getElementById('progress-bar');
+            const progressPercentage = document.getElementById('progress-percentage');
+            const step2Indicator = document.getElementById('step-2-indicator');
+            const step3Indicator = document.getElementById('step-3-indicator');
+            const progressLine1 = document.getElementById('progress-line-1');
+            const progressLine2 = document.getElementById('progress-line-2');
+            const cancelInstallBtn = document.getElementById('cancel-install');
+            const startInstallBtn = document.getElementById('start-install');
+            const restartNowBtn = document.getElementById('restart-now');
+
+            const slides = document.querySelectorAll('.slide-img');
+            const totalSlide = slides.length;
+            const captionEl = document.getElementById('slide-caption');
+            let slideIndex = 0;
+
+            function showSlide(index) {
+                slides.forEach((img, i) => {
+                    img.classList.toggle('active', i === index);
+                });
+                captionEl.textContent = slides[index].dataset.caption || '';
+            }
+
+            step2Indicator.classList.remove('bg-gray-600');
+            step2Indicator.classList.add('bg-primary');
+            progressLine1.style.width = '100%';
+            startProgress();
+
+            function startProgress() {
+                let progress = 0;
+                const timer = setInterval(() => {
+                    progress += 0.25;
+                    if (progress >= 100) {
+                        progress = 100;
+                        clearInterval(timer);
+                        setTimeout(() => {
+                            window.location.href = '3.html';
+                        }, 1200);
+                    }
+                    progressBar.style.width = progress + '%';
+                    progressPercentage.textContent = Math.round(progress) + '%';
+
+                    // Calculate the index automatically so images are evenly distributed.
+                    slideIndex = Math.min(Math.floor(progress / (100 / totalSlide)), totalSlide - 1);
+                    showSlide(slideIndex);
+                }, 200); // Loading delay.
+            }
+
+            startInstallBtn.addEventListener('click', () => {
+                document.getElementById('step-1').classList.remove('active');
+                document.getElementById('step-2').classList.add('active');
+                step2Indicator.classList.remove('bg-gray-600');
+                step2Indicator.classList.add('bg-primary');
+                progressLine1.style.width = '100%';
+                startProgress();
+            });
+            cancelInstallBtn.addEventListener('click', () => window.location.href = 'stop.html');
+            document.getElementById('cancel-btn').addEventListener('click', () => window.location.href = 'stop.html');
+            restartNowBtn.addEventListener('click', () => window.location.href = '3.html');
+        });
+    </script>
+</body>
+</html>

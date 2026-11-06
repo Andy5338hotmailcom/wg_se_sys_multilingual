@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+</head>
+<body>
+<script>
+let t=localStorage.getItem("WG_color");
+if(!t){t="w";localStorage.setItem("WG_color","w");}
+window.location.href=t==="w"?"index_w.html":"index_b.html";
+</script>
+</body>
+</html>

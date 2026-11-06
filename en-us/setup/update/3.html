@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>Update complete</title>
+<style>
+* {margin:0;padding:0;box-sizing:border-box;font-family:Microsoft YaHei,sans-serif;}
+body {
+    background: linear-gradient(120deg, #e8dff8, #f3eafb);
+    width: 100vw;
+    height: 100vh;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.title-text {
+    position: absolute;
+    top: 80px;
+    left: 60px;
+    animation: fadeInUp 1.2s ease-out;
+}
+.title-text h1 {
+    color: #4b2e83;
+    font-size: 36px;
+    font-weight: 600;
+}
+.title-text p {
+    color: #6b4e99;
+    margin-top: 12px;
+    font-size: 18px;
+}
+
+/* Centered completion message */
+.finish-box {
+    text-align: center;
+    animation: fadeInUp 1.2s 0.2s both;
+}
+.finish-box h2 {
+    font-size: 32px;
+    color: #4b2e83;
+    margin-bottom: 40px;
+}
+
+/* Final button with consistent styling */
+.start-btn {
+    width: 380px;
+    height: 60px;
+    border: none;
+    border-radius: 16px;
+    background: linear-gradient(90deg, #9c7cdd, #b198ee);
+    color: #fff;
+    font-size: 18px;
+    cursor: pointer;
+    transition: 0.2s;
+}
+.start-btn:hover {
+    transform: scale(1.02);
+    opacity: 0.9;
+}
+
+@keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(25px); }
+    to   { opacity: 1; transform: translateY(0); }
+}
+</style>
+</head>
+
+<body>
+
+<div class="title-text">
+    <h1>Update complete</h1>
+    <p>Wildgoose Second Preview Edition</p>
+</div>
+
+<div class="finish-box">
+    <h2>Thank you for updating to the latest Wildgoose preview</h2>
+    <button class="start-btn" onclick="enterDesktop()">Let's get started</button>
+</div>
+
+<script>
+function enterDesktop() {
+    // Navigate to the desktop.
+    location.href = "../../login.html";
+}
+</script>
+
+</body>
+</html>

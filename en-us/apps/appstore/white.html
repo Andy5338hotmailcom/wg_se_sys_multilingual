@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>App Store</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+
+        body {
+            background: #ffffff;
+            color: #111;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        /* Search bar */
+        .search-box {
+            width: 100%;
+            padding: 12px 16px;
+            border-radius: 12px;
+            border: 1px solid #ddd;
+            background: #f5f7fa;
+            color: #333;
+            font-size: 16px;
+            margin-bottom: 20px;
+            outline: none;
+        }
+
+        /* Tabs */
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+
+        .tab {
+            padding: 8px 16px;
+            background: #f5f7fa;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+
+        .tab.active {
+            background: #5a67ff;
+            color: #fff;
+        }
+
+        /* App grid */
+        .app-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+            gap: 16px;
+        }
+
+        /* App cards */
+        .app-card {
+            background: #f9fafb;
+            border: 1px solid #eee;
+            border-radius: 12px;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .app-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 8px;
+            object-fit: cover;
+        }
+
+        .app-name {
+            font-size: 16px;
+            font-weight: bold;
+        }
+
+        .app-category {
+            font-size: 12px;
+            color: #555;
+            background: #eef1f5;
+            padding: 3px 8px;
+            border-radius: 4px;
+            display: inline-block;
+        }
+
+        /* Buttons */
+        .install-btn {
+            padding: 8px;
+            border-radius: 8px;
+            border: none;
+            background: #5a67ff;
+            color: white;
+            cursor: pointer;
+            margin-top: auto;
+        }
+        .open-btn {
+            background: #28a745;
+        }
+        .uninstall-btn {
+            background: #ff4a66;
+        }
+        .installed-label {
+            font-size: 12px;
+            color: #4caf50;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h2>📱 App Store</h2>
+        <br>
+        <input type="text" class="search-box" id="search" placeholder="Search apps..." oninput="searchApp()">
+
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('store')">Store</div>
+            <div class="tab" onclick="switchTab('manage')">Manage apps</div>
+            <div class="tab" onclick="switchTab('wgapp')">Install WGAPP</div>
+        </div>
+
+        <div class="app-grid" id="app-container"></div>
+    </div>
+
+    <script>
+        // ==============================
+        // Store app catalog (same format as app_list).
+        // ==============================
+        const STORE_APPS = [
+            { id: "win12web", name: "Windows 12 Web", icon: "ico/win12web.png", path: "https://win12-online.github.io/win12/boot.html", category: "Developer: tjy-github | Category: Simulation" },
+            { id: "winxpweb", name: "Windows XP Web", icon: "ico/winxpweb.png", path: "https://win32.run/", category: "Developer: win32.run | Category: Simulation" },
+            { id: "wildgoose", name: "Wildgoose Sandbox", icon: "icon.png", path: "index.html", category: "Developer: Wildgoose | Category: Simulation" },
+            { id: "src", name: "Student Roll Call", icon: "ico/src.ico", path: "apps/src/index.html", category: "Developer: Wildgoose | Category: Education" }
+        ];
+
+        let currentTab = "store";
+
+        // ==============================
+        // Read locally installed apps.
+        // ==============================
+        function getLocalApps() {
+            try {
+                return JSON.parse(localStorage.getItem("app_list")) || [];
+            } catch (e) {
+                return [];
+            }
+        }
+
+        // ==============================
+        // Save locally.
+        // ==============================
+        function saveLocalApps(list) {
+            localStorage.setItem("app_list", JSON.stringify(list));
+        }
+
+        // ==============================
+        // Install an app.
+        // ==============================
+        function installApp(id) {
+            const local = getLocalApps();
+            const app = STORE_APPS.find(a => a.id === id);
+            if (!app) return;
+
+            const exists = local.some(i => i.id === id);
+            if (exists) {
+                alert("Already installed!");
+                return;
+            }
+
+            local.push(app);
+            saveLocalApps(local);
+            render();
+            alert("✅ Installation successful!");
+        }
+
+        // ==============================
+        // Uninstall an app.
+        // ==============================
+        function uninstallApp(id) {
+            if (!confirm("Are you sure you want to uninstall this app?")) return;
+            let local = getLocalApps();
+            local = local.filter(i => i.id !== id);
+            saveLocalApps(local);
+            render();
+            alert("✅ Uninstalled successfully!");
+        }
+
+        // ==============================
+        // Open an app (postMessage).
+        // ==============================
+        function openAppFromStore(appId) {
+            console.log("Opening app:", appId);
+            parent.postMessage({
+                action: "openApp",
+                appId: appId
+            }, "*");
+        }
+
+        // ==============================
+        // Render the page.
+        // ==============================
+        function render() {
+            const container = document.getElementById("app-container");
+            container.innerHTML = "";
+            const local = getLocalApps();
+            const keyword = document.getElementById("search").value.toLowerCase();
+
+            let list = [];
+            if (currentTab === "store") list = STORE_APPS;
+            else if (currentTab === "manage") list = local;
+
+            // Filter search results.
+            list = list.filter(a => a.name.toLowerCase().includes(keyword) || a.id.includes(keyword));
+
+            list.forEach(app => {
+                const installed = local.some(i => i.id === app.id);
+                const card = document.createElement("div");
+                card.className = "app-card";
+
+                let btnHtml = "";
+                if (installed) {
+                    if(currentTab === "manage"){
+                        btnHtml = `
+                            <button class="install-btn open-btn" onclick="openAppFromStore('${app.id}')">Open</button>
+                            <button class="install-btn uninstall-btn" onclick="uninstallApp('${app.id}')">Uninstall</button>
+                        `;
+                    }else{
+                        btnHtml = `<button class="install-btn open-btn" onclick="openAppFromStore('${app.id}')">Open</button>`;
+                    }
+                } else {
+                    btnHtml = `<button class="install-btn" onclick="installApp('${app.id}')">Install</button>`;
+                }
+
+                card.innerHTML = `
+                    <img src="${app.icon}" class="app-icon">
+                    <div class="app-name">${app.name}</div>
+                    <div class="app-category">${app.category || "Uncategorized"}</div>
+                    ${installed ? '<span class="installed-label">Installed</span>' : ''}
+                    ${btnHtml}
+                `;
+                container.appendChild(card);
+            });
+        }
+
+        // ==============================
+        // Switch tabs.
+        // ==============================
+        function switchTab(tab) {
+            if (tab === "wgapp") {
+                openAppFromStore("appinstall");
+                tab = "store";
+            }
+
+            currentTab = tab;
+            document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+            if(tab === "store") document.querySelectorAll(".tab")[0].classList.add("active");
+            if(tab === "manage") document.querySelectorAll(".tab")[1].classList.add("active");
+            render();
+        }
+
+        // ==============================
+        // Search.
+        // ==============================
+        function searchApp() { render(); }
+
+        // Initialize.
+        window.onload = render;
+    </script>
+</body>
+</html>

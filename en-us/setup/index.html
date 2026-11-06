@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wildgoose Setup - Region and language</title>
+    <link rel="stylesheet" href="wizard.css">
+</head>
+<body>
+    <main class="setup-shell">
+        <header class="setup-header">
+            <img src="../icon.png" alt="" class="setup-logo">
+            <h1>Wildgoose</h1>
+        </header>
+        <section class="setup-card" aria-labelledby="page-title">
+            <p class="step-label">Setup · Step 1 of 4</p>
+            <h2 id="page-title">Region and language settings</h2>
+            <p class="intro">Choose the language, time format, and keyboard layout to use during setup.</p>
+            <div class="form-fields">
+                <label class="field">
+                    <span>Language to install</span>
+                    <select id="install-language">
+                        <option value="en-us">English</option>
+                        <option value="chinese">Chinese</option>
+                    </select>
+                </label>
+                <label class="field">
+                    <span>Time and currency format</span>
+                    <select id="time-format">
+                        <option value="system">Use system settings</option>
+                        <option value="test2">Use system settings 2</option>
+                    </select>
+                </label>
+                <label class="field">
+                    <span>Keyboard and input method</span>
+                    <select id="keyboard-input">
+                        <option value="en-us">English</option>
+                        <option value="chinese">Chinese</option>
+                    </select>
+                </label>
+            </div>
+            <div class="actions actions-split">
+                <a class="button button-secondary" href="stop.html">Cancel setup</a>
+                <button class="button button-primary" id="next-step" type="button">Next</button>
+            </div>
+        </section>
+    </main>
+    <script>
+        const fields = {
+            "install-language": "WG_setup_language",
+            "time-format": "WG_setup_time_format",
+            "keyboard-input": "WG_setup_keyboard"
+        };
+        Object.entries(fields).forEach(([id, key]) => {
+            const select = document.getElementById(id);
+            const savedValue = localStorage.getItem(key);
+            if (savedValue && [...select.options].some(option => option.value === savedValue)) {
+                select.value = savedValue;
+            }
+        });
+        document.getElementById("next-step").addEventListener("click", () => {
+            Object.entries(fields).forEach(([id, key]) => {
+                localStorage.setItem(key, document.getElementById(id).value);
+            });
+            window.location.href = "2.html";
+        });
+    </script>
+</body>
+</html>

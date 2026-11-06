@@ -1,0 +1,304 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <title>Software Registry</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", sans-serif;
+        }
+        body {
+            background: #ffffff;
+            color: #111122;
+            padding: 20px;
+            margin: 0;
+        }
+        .container {
+            max-width: 900px;
+            margin: 0 auto;
+        }
+        .section {
+            margin-bottom: 20px;
+        }
+        h4 {
+            margin: 0 0 8px 0;
+            color: #333344;
+        }
+        textarea {
+            width: 100%;
+            height: 180px;
+            background: #f7f8fa;
+            color: #111;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            padding: 12px;
+            font-size: 14px;
+            resize: vertical;
+        }
+        input[type="text"] {
+            width: 100%;
+            background: #f7f8fa;
+            color: #111;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 10px 12px;
+            font-size: 14px;
+        }
+        .btn-row {
+            margin-top: 8px;
+            display: flex;
+            gap: 8px;
+        }
+        button {
+            padding: 8px 14px;
+            border-radius: 8px;
+            border: none;
+            background: #4a5aff;
+            color: white;
+            cursor: pointer;
+        }
+        button.danger {
+            background: #ff4a66;
+        }
+        button.gray {
+            background: #889;
+        }
+        .tip {
+            color: #666;
+            font-size: 12px;
+            margin-top: 6px;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h2>🧪 Software Registry Editor</h2>
+    <p style="color:#666">Desktop wallpaper changes take effect immediately after saving.</p>
+
+    <!-- 1. System theme -->
+    <div class="section">
+        <h4>🎨 System theme (WG_color)</h4>
+        <select id="WG_color">
+            <option value="b">Dark theme (b)</option>
+            <option value="w">Light theme (w)</option>
+        </select>
+        <div class="btn-row">
+            <button onclick="saveThemeColor()">💾 Save</button>
+            <button class="gray" onclick="loadThemeColor()">📂 Load</button>
+        </div>
+        <div class="tip">Use b for the dark theme or w for the light theme. The desktop and Start menu update immediately after saving.</div>
+    </div>
+
+    <!-- 2. Desktop wallpaper -->
+    <div class="section">
+        <h4>🖼️ Desktop wallpaper (WG_desktop_wallpaper)</h4>
+        <input type="text" id="WG_desktop_wallpaper" placeholder="./wallpaper/wildgoose/bg.jpg">
+        <label for="WG_desktop_wallpaper_time">Slideshow interval (WG_desktop_wallpaper_time, seconds)</label>
+        <input type="number" id="WG_desktop_wallpaper_time" min="1" step="1">
+        <div class="btn-row">
+            <button onclick="saveDesktopWallpaper()">💾 Save</button>
+            <button class="gray" onclick="loadDesktopWallpaper()">📂 Load</button>
+            <button class="danger" onclick="resetDesktopWallpaper()">↩️ Restore defaults</button>
+        </div>
+        <div class="tip">Enter a single wallpaper path or separate multiple paths with commas, for example: ./wallpaper/a.jpg, ./wallpaper/b.jpg. Multiple wallpapers rotate at the selected interval; a single wallpaper does not rotate. The default interval is 60 seconds. Changes take effect immediately after saving.</div>
+    </div>
+
+    <!-- 3. Custom app list -->
+    <div class="section">
+        <h4>📱 Custom app list (app_list)</h4>
+        <textarea id="app_list"></textarea>
+        <div class="btn-row">
+            <button onclick="saveAppList()">💾 Save</button>
+            <button class="gray" onclick="loadAppList()">📂 Load</button>
+            <button class="danger" onclick="clearAppList()">🗑️ Clear</button>
+        </div>
+        <div class="tip">Format: [{"id":"test","name":"Example","icon":"icon.png","path":"test.html"}]</div>
+    </div>
+
+    <!-- 3. Start menu pinned apps (fixedApps) -->
+    <div class="section">
+        <h4>📌 Start menu pinned apps (fixedApps)</h4>
+        <textarea id="fixedApps"></textarea>
+        <div class="btn-row">
+            <button onclick="savePinned()">💾 Save</button>
+            <button class="gray" onclick="loadPinned()">📂 Load</button>
+            <button class="danger" onclick="clearPinned()">🗑️ Clear</button>
+        </div>
+        <div class="tip">Format: ["doc","setting"]</div>
+    </div>
+
+    <!-- 4. Taskbar pinned apps (fixedTaskbarApps) -->
+    <div class="section">
+        <h4>📎 Taskbar pinned apps (fixedTaskbarApps)</h4>
+        <textarea id="fixedTaskbarApps"></textarea>
+        <div class="btn-row">
+            <button onclick="saveTaskbarPinned()">💾 Save</button>
+            <button class="gray" onclick="loadTaskbarPinned()">📂 Load</button>
+            <button class="danger" onclick="clearTaskbarPinned()">🗑️ Clear</button>
+        </div>
+        <div class="tip">Format: ["wgver","setting"]. Only app IDs are stored.</div>
+    </div>
+
+    <!-- 5. Desktop icons (desktopIcons) -->
+    <div class="section">
+        <h4>🖥️ Desktop icons (desktopIcons)</h4>
+        <textarea id="desktopIcons"></textarea>
+        <div class="btn-row">
+            <button onclick="saveDesktop()">💾 Save</button>
+            <button class="gray" onclick="loadDesktop()">📂 Load</button>
+            <button class="danger" onclick="clearDesktop()">🗑️ Clear</button>
+        </div>
+        <div class="tip">Format: ["doc","setting"]</div>
+    </div>
+</div>
+
+<script>
+    // System theme (WG_color).
+    function loadThemeColor() {
+        const theme = localStorage.getItem("WG_color");
+        const value = theme || "w";
+        if (value !== "b" && value !== "w") {
+            alert("Invalid WG_color value. Select b or w and save.");
+            return;
+        }
+        document.getElementById("WG_color").value = value;
+    }
+    function saveThemeColor() {
+        const value = document.getElementById("WG_color").value;
+        if (value !== "b" && value !== "w") {
+            alert("The theme value must be b or w.");
+            return;
+        }
+        localStorage.setItem("WG_color", value);
+        parent.postMessage({ action: "theme-change", theme: value }, "*");
+    }
+
+    // Desktop wallpaper (WG_desktop_wallpaper).
+    const DEFAULT_DESKTOP_WALLPAPER = "./wallpaper/wildgoose/bg.jpg";
+    const DEFAULT_DESKTOP_WALLPAPER_TIME = 60;
+    function loadDesktopWallpaper() {
+        document.getElementById("WG_desktop_wallpaper").value =
+            localStorage.getItem("WG_desktop_wallpaper") || DEFAULT_DESKTOP_WALLPAPER;
+        document.getElementById("WG_desktop_wallpaper_time").value =
+            localStorage.getItem("WG_desktop_wallpaper_time") || DEFAULT_DESKTOP_WALLPAPER_TIME;
+    }
+    function saveDesktopWallpaper() {
+        const value = document.getElementById("WG_desktop_wallpaper").value.trim();
+        if (!value) {
+            alert("The wallpaper path cannot be empty.");
+            return;
+        }
+        const interval = Number(document.getElementById("WG_desktop_wallpaper_time").value);
+        if (!Number.isInteger(interval) || interval < 1) {
+            alert("The wallpaper interval must be a whole number of at least 1 second.");
+            return;
+        }
+        const wallpapers = value.split(",").map(path => path.trim()).filter(Boolean);
+        if (wallpapers.length === 0) {
+            alert("Enter at least one wallpaper path.");
+            return;
+        }
+        const wallpaperValue = wallpapers.join(", ");
+        localStorage.setItem("WG_desktop_wallpaper", wallpaperValue);
+        localStorage.setItem("WG_desktop_wallpaper_time", String(interval));
+        parent.postMessage({ action: "desktop-wallpaper-change", wallpaper: wallpaperValue, interval }, "*");
+        alert("✅ Saved successfully!");
+    }
+    function resetDesktopWallpaper() {
+        document.getElementById("WG_desktop_wallpaper").value = DEFAULT_DESKTOP_WALLPAPER;
+        document.getElementById("WG_desktop_wallpaper_time").value = DEFAULT_DESKTOP_WALLPAPER_TIME;
+        saveDesktopWallpaper();
+    }
+
+    // App list.
+    function loadAppList() {
+        const v = localStorage.getItem("app_list") || "[]";
+        document.getElementById("app_list").value = v;
+    }
+    function saveAppList() {
+        try {
+            const v = document.getElementById("app_list").value.trim();
+            JSON.parse(v);
+            localStorage.setItem("app_list", v);
+            alert("✅ Saved successfully!");
+        } catch(e) { alert("JSON error: "+e.message); }
+    }
+    function clearAppList() {
+        if(confirm("Are you sure you want to clear this?")){
+            localStorage.removeItem("app_list");
+            loadAppList();
+        }
+    }
+
+    // Start menu pinned apps (fixedApps).
+    function loadPinned() {
+        const v = localStorage.getItem("fixedApps") || "[]";
+        document.getElementById("fixedApps").value = v;
+    }
+    function savePinned() {
+        try {
+            const v = document.getElementById("fixedApps").value.trim();
+            JSON.parse(v);
+            localStorage.setItem("fixedApps", v);
+            alert("✅ Saved successfully!");
+        } catch(e) { alert("JSON error: "+e.message); }
+    }
+    function clearPinned() {
+        if(confirm("Are you sure you want to clear this?")){
+            localStorage.removeItem("fixedApps");
+            loadPinned();
+        }
+    }
+
+    // ===== Taskbar pinned apps (fixedTaskbarApps) =====
+    function loadTaskbarPinned() {
+        const v = localStorage.getItem("fixedTaskbarApps") || "[]";
+        document.getElementById("fixedTaskbarApps").value = v;
+    }
+    function saveTaskbarPinned() {
+        try {
+            const v = document.getElementById("fixedTaskbarApps").value.trim();
+            JSON.parse(v);
+            localStorage.setItem("fixedTaskbarApps", v);
+            alert("✅ Saved successfully!");
+        } catch(e) { alert("JSON error: "+e.message); }
+    }
+    function clearTaskbarPinned() {
+        if(confirm("Are you sure you want to clear this?")){
+            localStorage.removeItem("fixedTaskbarApps");
+            loadTaskbarPinned();
+        }
+    }
+
+    // Desktop icons (desktopIcons).
+    function loadDesktop() {
+        const v = localStorage.getItem("desktopIcons") || "[]";
+        document.getElementById("desktopIcons").value = v;
+    }
+    function saveDesktop() {
+        try {
+            const v = document.getElementById("desktopIcons").value.trim();
+            JSON.parse(v);
+            localStorage.setItem("desktopIcons", v);
+            alert("✅ Saved successfully!");
+        } catch(e) { alert("JSON error: "+e.message); }
+    }
+    function clearDesktop() {
+        if(confirm("Are you sure you want to clear this?")){
+            localStorage.removeItem("desktopIcons");
+            loadDesktop();
+        }
+    }
+
+    window.onload = () => {
+        loadThemeColor();
+        loadDesktopWallpaper();
+        loadAppList();
+        loadPinned();
+        loadTaskbarPinned();
+        loadDesktop();
+    };
+</script>
+</body>
+</html>

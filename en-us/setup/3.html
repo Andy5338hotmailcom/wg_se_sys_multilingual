@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en-US">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Wildgoose Setup - Select an operating system</title>
+    <link rel="stylesheet" href="wizard.css">
+</head>
+<body>
+    <main class="setup-shell">
+        <header class="setup-header">
+            <img src="../icon.png" alt="" class="setup-logo">
+            <h1>Wildgoose</h1>
+        </header>
+        <section class="setup-card" aria-labelledby="page-title">
+            <p class="step-label">Setup · Step 3 of 4</p>
+            <h2 id="page-title">Select an operating system to install</h2>
+            <p class="intro">Choose the Wildgoose edition to install on this device.</p>
+            <label class="field">
+                <span>Operating system</span>
+                <select id="operating-system">
+                    <option value="Wildgoose SE">Wildgoose SE</option>
+                </select>
+            </label>
+            <div class="actions actions-split">
+                <a class="button button-secondary" href="2.html">Back</a>
+                <button class="button button-primary" id="next-step" type="button">Next</button>
+            </div>
+        </section>
+    </main>
+    <script>
+        const osSelect = document.getElementById("operating-system");
+        const savedOs = localStorage.getItem("WG_setup_os");
+        if (savedOs && [...osSelect.options].some(option => option.value === savedOs)) {
+            osSelect.value = savedOs;
+        }
+        document.getElementById("next-step").addEventListener("click", () => {
+            localStorage.setItem("WG_setup_os", osSelect.value);
+            window.location.href = "4.html";
+        });
+    </script>
+</body>
+</html>
