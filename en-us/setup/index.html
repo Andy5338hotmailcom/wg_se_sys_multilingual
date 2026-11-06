@@ -21,14 +21,14 @@
                     <span>Language to install</span>
                     <select id="install-language">
                         <option value="en-us">English</option>
-                        <option value="chinese">Chinese</option>
+                        <option value="zh-cn">中文简体</option>
                     </select>
                 </label>
                 <label class="field">
                     <span>Time and currency format</span>
                     <select id="time-format">
                         <option value="system">Use system settings</option>
-                        <option value="test2">Use system settings 2</option>
+                        <option value="test2">Use system settings</option>
                     </select>
                 </label>
                 <label class="field">
@@ -58,11 +58,24 @@
                 select.value = savedValue;
             }
         });
-        document.getElementById("next-step").addEventListener("click", () => {
+        const languageSelect = document.getElementById("install-language");
+        const nextStepButton = document.getElementById("next-step");
+        const multilingualSetupUrl = "https://andy5338hotmailcom.github.io/wg_sys_se/setup";
+
+        function updateNextStepLabel() {
+            nextStepButton.textContent = languageSelect.value === "zh-cn" ? "应用" : "Next";
+        }
+
+        languageSelect.addEventListener("change", updateNextStepLabel);
+        updateNextStepLabel();
+
+        nextStepButton.addEventListener("click", () => {
             Object.entries(fields).forEach(([id, key]) => {
                 localStorage.setItem(key, document.getElementById(id).value);
             });
-            window.location.href = "2.html";
+            window.location.href = languageSelect.value === "zh-cn"
+                ? multilingualSetupUrl
+                : "2.html";
         });
     </script>
 </body>
