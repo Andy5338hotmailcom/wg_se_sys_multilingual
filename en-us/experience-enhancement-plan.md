@@ -61,14 +61,11 @@ Four Windows Aero-style interactions are being added to the window system in `de
 
 ### 3. Peek (planned)
 
-- Hover over a taskbar app icon to show a small preview of its window.
+- 悬停任务栏应用图标 → 显示应用名称与窗口缩略预览。✅ 已完成
 - Alternatively, “Show desktop” could temporarily make windows transparent instead of hiding them, restoring them when the pointer moves away.
-- Reference: existing taskbar logic in `renderTaskbarApps()`.
+- 实现：任务栏悬停卡片显示名称和 iframe 窗口缩略预览；未运行应用显示图标占位（`desktop.js`、`whitedesktop.css`、`blackdesktop.css`）。
+- 待做：或"显示桌面"时临时将窗口透明化（而非全部隐藏），移开后恢复。
 
-### 4. Snake (planned)
-
-- Confirmed as the Windows 7-style **window shake that minimizes other windows** (the Aero Shake effect).
-- Combine its implementation with item 2, Shake.
 
 ### Files
 

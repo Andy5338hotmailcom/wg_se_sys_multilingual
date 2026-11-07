@@ -76,6 +76,8 @@ function mergeAppList() {
 const APP_LIST = mergeAppList();
 let currentRightClickApp = null;
 let taskbarUnpinnedOrder = [];
+let taskbarPreviewElement = null;
+let taskbarPreviewHideTimer = null;
 
 if (!localStorage.getItem("fixedApps")) {
     localStorage.setItem("fixedApps", JSON.stringify(["doc", "setting"]));
@@ -134,6 +136,7 @@ function moveTaskbarItem(taskApps, draggedItem, targetItem, insertBefore) {
 function renderTaskbarApps() {
     const taskApps = document.querySelector(".task-apps");
     if (!taskApps) return;
+    hideTaskbarPreview();
     taskApps.innerHTML = "";
     const fixedIds = JSON.parse(localStorage.getItem("fixedTaskbarApps") || "[]");
     const runningWindows = [...document.querySelectorAll(".app-window")];
@@ -161,9 +164,10 @@ function renderTaskbarApps() {
         item.draggable = true;
         if (isPinned) item.classList.add("pinned");
         if (win) item.classList.add("running");
-        item.title = app.name;
         item.setAttribute("aria-label", app.name);
         item.innerHTML = `<img src="${app.icon}" alt="">`;
+        item.addEventListener("mouseenter", () => showTaskbarPreview(item, app, win));
+        item.addEventListener("mouseleave", scheduleHideTaskbarPreview);
         item.ondragstart = event => {
             item.classList.add("dragging");
             event.dataTransfer.effectAllowed = "move";
@@ -211,6 +215,90 @@ function renderTaskbarApps() {
         };
         taskApps.appendChild(item);
     });
+}
+
+function showTaskbarPreview(item, app, win) {
+    if (taskbarPreviewHideTimer !== null) {
+        clearTimeout(taskbarPreviewHideTimer);
+        taskbarPreviewHideTimer = null;
+    }
+    if (taskbarPreviewElement) taskbarPreviewElement.remove();
+
+    const preview = document.createElement("div");
+    preview.className = "taskbar-preview";
+    preview.setAttribute("role", "tooltip");
+
+    const title = document.createElement("div");
+    title.className = "taskbar-preview-title";
+    title.textContent = app.name;
+    preview.appendChild(title);
+
+    const viewport = document.createElement("div");
+    viewport.className = "taskbar-preview-viewport";
+    if (win) {
+        const sourceFrame = win.querySelector("iframe");
+        if (sourceFrame) {
+            const frame = document.createElement("iframe");
+            const frameWidth = sourceFrame.clientWidth || 600;
+            const frameHeight = sourceFrame.clientHeight || 360;
+            const previewWidth = Math.min(320, Math.max(0, window.innerWidth - 40));
+            const scale = Math.min(previewWidth / frameWidth, 190 / frameHeight);
+            frame.src = sourceFrame.src;
+            frame.title = `${app.name}窗口预览`;
+            frame.tabIndex = -1;
+            frame.setAttribute("aria-hidden", "true");
+            frame.style.width = `${frameWidth}px`;
+            frame.style.height = `${frameHeight}px`;
+            frame.style.transform = `translate(-50%, -50%) scale(${scale})`;
+            viewport.appendChild(frame);
+        }
+    } else {
+        const placeholder = document.createElement("div");
+        placeholder.className = "taskbar-preview-placeholder";
+        const icon = document.createElement("img");
+        icon.src = app.icon;
+        icon.alt = "";
+        const message = document.createElement("span");
+        message.textContent = "窗口未打开";
+        placeholder.append(icon, message);
+        viewport.appendChild(placeholder);
+    }
+    preview.appendChild(viewport);
+    preview.addEventListener("mouseenter", () => {
+        if (taskbarPreviewHideTimer !== null) {
+            clearTimeout(taskbarPreviewHideTimer);
+            taskbarPreviewHideTimer = null;
+        }
+    });
+    preview.addEventListener("mouseleave", scheduleHideTaskbarPreview);
+
+    document.body.appendChild(preview);
+    const itemRect = item.getBoundingClientRect();
+    const previewRect = preview.getBoundingClientRect();
+    preview.style.left = `${Math.max(8, Math.min(
+        itemRect.left + itemRect.width / 2 - previewRect.width / 2,
+        window.innerWidth - previewRect.width - 8
+    ))}px`;
+    preview.style.top = `${Math.max(8, itemRect.top - previewRect.height - 10)}px`;
+    taskbarPreviewElement = preview;
+}
+
+function scheduleHideTaskbarPreview() {
+    if (taskbarPreviewHideTimer !== null) clearTimeout(taskbarPreviewHideTimer);
+    taskbarPreviewHideTimer = setTimeout(() => {
+        if (taskbarPreviewElement) taskbarPreviewElement.remove();
+        taskbarPreviewElement = null;
+        taskbarPreviewHideTimer = null;
+    }, 140);
+}
+
+function hideTaskbarPreview() {
+    if (taskbarPreviewHideTimer !== null) {
+        clearTimeout(taskbarPreviewHideTimer);
+        taskbarPreviewHideTimer = null;
+    }
+    if (taskbarPreviewElement) taskbarPreviewElement.remove();
+    taskbarPreviewElement = null;
 }
 
 // ==============================
