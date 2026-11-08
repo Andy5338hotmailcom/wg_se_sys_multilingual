@@ -12,7 +12,7 @@
 | Current release | Start menu refactor (iframe and messaging) | ✅ Complete |
 | Current release | App record format upgrade (whitepath/blackpath/version) | ✅ Complete |
 | Current release | Automatic desktop icon column wrapping | ✅ Complete |
-| Current release | Aero window effects | 🔨 In progress (8-direction Snap ✅; Shake/Peek planned) |
+| 🟢 当前版本 | Aero 窗口特效 | 🔨 进行中（Snap 8方向 ✅，Shake ✅，Peek 待做） |
 | Current release | Basic cleanup (remove duplication and legacy code; unify theme scripts) | 🔨 Partially complete |
 | Deferred to sys10 | ④ Remove eval injection points, sandbox iframes, validate postMessage origins; ⑤ Localize offline resources | TBD |
 | Future work | Real installation logic (keep the simulated setup progress bar for now) | TBD |
@@ -54,10 +54,11 @@ Four Windows Aero-style interactions are being added to the window system in `de
 - Implementation: rewrite `makeWindowDraggable` and add `getSnapTarget`, `ensureSnapPreview`, `showSnapPreview`, and `hideSnapPreview` in `desktop.js`.
 - Tested: all eight directions, preview display and dismissal, and both quarter-screen and half-screen snapping.
 
-### 2. Shake (planned)
+### 2. Shake（抖动）✅ 已完成
 
 - Quickly shake a window by its title bar to minimize every other window and keep the active one visible.
-- Shake it again to restore the minimized windows.
+- 手动最小化的窗口不会被抖动恢复；通过任务栏重新打开、关闭窗口或点击"显示桌面"后会同步清理抖动恢复状态。
+- 实现：标题栏左右移动达到阈值并在短时间内完成 3 次方向切换时触发；恢复列表仅记录本次抖动隐藏的窗口（`desktop.js`）。
 
 ### 3. Peek (planned)
 

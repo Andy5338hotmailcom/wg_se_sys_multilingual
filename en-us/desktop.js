@@ -78,6 +78,7 @@ let currentRightClickApp = null;
 let taskbarUnpinnedOrder = [];
 let taskbarPreviewElement = null;
 let taskbarPreviewHideTimer = null;
+let shakeMinimizedWindows = [];
 
 if (!localStorage.getItem("fixedApps")) {
     localStorage.setItem("fixedApps", JSON.stringify(["doc", "setting"]));
@@ -205,6 +206,7 @@ function renderTaskbarApps() {
                 return;
             }
             const shouldShow = currentWindow.style.display === "none";
+            if (shouldShow) forgetShakeMinimizedWindow(currentWindow);
             currentWindow.style.display = shouldShow ? "flex" : "none";
             if (shouldShow) bringWindowToTop(currentWindow);
         };
@@ -571,6 +573,7 @@ function openApp(app) {
 
     const exists = document.querySelector(`.app-window[data-id="${app.id}"]`);
     if (exists) {
+        forgetShakeMinimizedWindow(exists);
         exists.style.display = "flex";
         bringWindowToTop(exists);
         renderTaskbarApps();
@@ -695,6 +698,30 @@ function hideSnapPreview() {
 // ==============================
 // Window dragging and eight-direction Aero Snap.
 // ==============================
+function forgetShakeMinimizedWindow(win) {
+    shakeMinimizedWindows = shakeMinimizedWindows.filter(item => item !== win);
+}
+
+function toggleShakeWindows(activeWindow) {
+    const minimizedWindows = shakeMinimizedWindows.filter(
+        win => win.isConnected && win.style.display === "none"
+    );
+    if (minimizedWindows.length > 0) {
+        shakeMinimizedWindows = [];
+        minimizedWindows.forEach(win => {
+            win.style.display = "flex";
+        });
+    } else {
+        shakeMinimizedWindows = [...document.querySelectorAll(".app-window")].filter(
+            win => win !== activeWindow && win.style.display !== "none"
+        );
+        shakeMinimizedWindows.forEach(win => {
+            win.style.display = "none";
+        });
+    }
+    renderTaskbarApps();
+}
+
 function makeWindowDraggable(win) {
     const header = win.querySelector(".window-header");
     if (!header) return;
@@ -704,6 +731,13 @@ function makeWindowDraggable(win) {
         const rect = win.getBoundingClientRect();
         const offsetX = e.clientX - rect.left;
         const offsetY = e.clientY - rect.top;
+        const shakeGesture = {
+            lastActivity: performance.now(),
+            direction: 0,
+            extremeX: e.clientX,
+            reversals: 0
+        };
+        let shakeTriggered = false;
 
         // Save the normal position for restoring from Snap.
         // Update it only when dragging a window that is not already snapped.
@@ -741,8 +775,36 @@ function makeWindowDraggable(win) {
         }
 
         function move(e) {
-            const target = getSnapTarget(e);
-            if (target) {
+            const now = performance.now();
+            if (!shakeTriggered) {
+                if (now - shakeGesture.lastActivity > 750) {
+                    shakeGesture.direction = 0;
+                    shakeGesture.extremeX = e.clientX;
+                    shakeGesture.reversals = 0;
+                } else {
+                    const displacement = e.clientX - shakeGesture.extremeX;
+                    if (Math.abs(displacement) >= 28) {
+                        const direction = Math.sign(displacement);
+                        if (shakeGesture.direction === 0) {
+                            shakeGesture.direction = direction;
+                        } else if (direction !== shakeGesture.direction) {
+                            shakeGesture.direction = direction;
+                            shakeGesture.reversals++;
+                            if (shakeGesture.reversals >= 3) {
+                                shakeTriggered = true;
+                                toggleShakeWindows(win);
+                            }
+                        }
+                        shakeGesture.extremeX = e.clientX;
+                    }
+                }
+                shakeGesture.lastActivity = now;
+            }
+
+            const target = shakeTriggered ? null : getSnapTarget(e);
+            if (shakeTriggered) {
+                hideSnapPreview();
+            } else if (target) {
                 // Show the frosted preview at an edge and move the window with the pointer; snap on release.
                 showSnapPreview(target.rect);
             } else {
@@ -764,7 +826,7 @@ function makeWindowDraggable(win) {
             document.removeEventListener("mouseup", stop);
             hideSnapPreview();
             // Snap on release if the pointer is still in a snap zone; otherwise restore the window.
-            const target = getSnapTarget(e);
+            const target = shakeTriggered ? null : getSnapTarget(e);
             if (target) {
                 applySnap(target.mode, target.rect);
             } else if (snapped) {
@@ -787,6 +849,7 @@ function closeAppWindow(win) {
     if (win.classList.contains("fullscreen")) {
         document.body.classList.remove("window-fullscreen");
     }
+    forgetShakeMinimizedWindow(win);
     win.remove();
     renderTaskbarApps();
 }
@@ -918,6 +981,7 @@ window.onload = () => {
     const showDesktop = document.querySelector(".show-desktop");
     if (showDesktop) {
         showDesktop.onclick = () => {
+            shakeMinimizedWindows = [];
             document.querySelectorAll(".app-window").forEach(win => win.style.display = "none");
             const menu = document.getElementById("startMenu");
             if (menu) menu.style.display = "none";

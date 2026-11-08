@@ -54,6 +54,8 @@
     <title>Shutting down...</title>
 </head>
 
+<audio id="startSound" src="media\shutdown.wav" preload="auto" autoplay></audio>
+
 <body onload="
 setTimeout(()=>{
     document.getElementById('ld').remove();
@@ -65,7 +67,7 @@ setTimeout(()=>{
             location.href='index.html';
         }
     };
-},3000);">
+},5000);">
     </div>
     <loading id="ld">
         <svg width="50px" height="50px" viewBox="0 0 16 16">
