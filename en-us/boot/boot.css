@@ -1,0 +1,261 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    min-width: 320px;
+    min-height: 100vh;
+    min-height: 100dvh;
+    margin: 0;
+    padding: 24px;
+    display: grid;
+    place-items: center;
+    overflow-x: hidden;
+    color: #fff;
+    font-family: "Microsoft YaHei", system-ui, sans-serif;
+    background: linear-gradient(135deg, #f3e8ff, #a855f7 55%, #6b21a8);
+}
+
+.boot-page {
+    position: relative;
+    z-index: 1;
+    width: min(100%, 440px);
+    padding: 32px;
+    border: 1px solid rgba(255, 255, 255, 0.28);
+    border-radius: 24px;
+    background: rgba(255, 255, 255, 0.12);
+    box-shadow: 0 8px 32px rgba(31, 38, 135, 0.2);
+    -webkit-backdrop-filter: blur(16px);
+    backdrop-filter: blur(16px);
+    animation: boot-float 3s ease-in-out infinite;
+}
+
+.boot-title {
+    margin: 0 0 32px;
+    background: linear-gradient(90deg, #6b21a8, #e9d5ff);
+    background-clip: text;
+    color: transparent;
+    font-size: clamp(30px, 7vw, 42px);
+    font-weight: 700;
+    text-align: center;
+    -webkit-background-clip: text;
+}
+
+.boot-title-icon {
+    margin-right: 10px;
+    color: #6b21a8;
+    font-size: 0.78em;
+    vertical-align: 0.08em;
+}
+
+.boot-options {
+    display: grid;
+    gap: 16px;
+}
+
+.boot-option {
+    min-width: 0;
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 16px;
+    background: rgba(255, 255, 255, 0.12);
+    color: inherit;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.boot-option:hover,
+.boot-option:focus-visible {
+    transform: scale(1.025);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 5px #c084fc, 0 0 20px rgba(192, 132, 252, 0.55);
+}
+
+.boot-option:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
+}
+
+.boot-option-icon {
+    width: 48px;
+    height: 48px;
+    flex: 0 0 48px;
+    display: grid;
+    place-items: center;
+    border-radius: 50%;
+    background: rgba(147, 51, 234, 0.2);
+    color: #6b21a8;
+    font-size: 25px;
+}
+
+.boot-option-copy {
+    min-width: 0;
+}
+
+.boot-option-copy h2 {
+    margin: 0;
+    color: #fff;
+    font-size: 18px;
+    font-weight: 600;
+}
+
+.boot-option-copy p {
+    margin: 5px 0 0;
+    color: rgba(243, 232, 255, 0.86);
+    font-size: 13px;
+}
+
+.boot-actions {
+    margin-top: 32px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+}
+
+.boot-button {
+    min-height: 48px;
+    padding: 10px 12px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid rgba(255, 255, 255, 0.25);
+    border-radius: 10px;
+    background: rgba(255, 255, 255, 0.12);
+    color: #fff;
+    font: inherit;
+    text-align: center;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
+}
+
+.boot-button:hover,
+.boot-button:focus-visible {
+    transform: scale(1.025);
+    background: rgba(255, 255, 255, 0.2);
+    box-shadow: 0 0 5px #c084fc, 0 0 20px rgba(192, 132, 252, 0.55);
+}
+
+.boot-button:focus-visible {
+    outline: 3px solid #fff;
+    outline-offset: 3px;
+}
+
+.boot-decor {
+    position: fixed;
+    z-index: 0;
+    width: 120px;
+    aspect-ratio: 1;
+    border-radius: 50%;
+    background: rgba(147, 51, 234, 0.16);
+    filter: blur(28px);
+    pointer-events: none;
+    animation: boot-pulse 4s ease-in-out infinite;
+}
+
+.boot-decor-top {
+    top: 36px;
+    left: 36px;
+}
+
+.boot-decor-bottom {
+    right: 36px;
+    bottom: 36px;
+    width: 180px;
+    background: rgba(192, 132, 252, 0.22);
+    animation-delay: 1s;
+}
+
+.boot-page-options .boot-title {
+    margin-bottom: 28px;
+}
+
+.boot-page-options .boot-options {
+    gap: 12px;
+}
+
+.boot-page-options .boot-option {
+    padding: 16px;
+}
+
+.boot-page-options .boot-option-icon {
+    width: 40px;
+    height: 40px;
+    flex-basis: 40px;
+    font-size: 21px;
+}
+
+.boot-page-options .boot-option-copy h2 {
+    font-size: 16px;
+}
+
+.boot-page-options .boot-option-copy p {
+    font-size: 12px;
+}
+
+.boot-page-options .boot-button {
+    width: 100%;
+}
+
+@keyframes boot-float {
+    0%, 100% {
+        transform: translateY(0);
+    }
+
+    50% {
+        transform: translateY(-8px);
+    }
+}
+
+@keyframes boot-pulse {
+    0%, 100% {
+        opacity: 0.6;
+        transform: scale(1);
+    }
+
+    50% {
+        opacity: 1;
+        transform: scale(1.12);
+    }
+}
+
+@media (max-width: 420px) {
+    body {
+        padding: 16px;
+    }
+
+    .boot-page {
+        padding: 24px 20px;
+    }
+
+    .boot-actions {
+        grid-template-columns: 1fr;
+        gap: 10px;
+    }
+
+    .boot-decor-top {
+        top: 12px;
+        left: 12px;
+    }
+
+    .boot-decor-bottom {
+        right: 12px;
+        bottom: 12px;
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
+        scroll-behavior: auto !important;
+        transition-duration: 0.01ms !important;
+    }
+}
